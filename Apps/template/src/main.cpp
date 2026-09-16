@@ -113,6 +113,14 @@ int main(int argc, char** argv)
 	while (!WindowShouldClose())
 	{
 		float dt = GetFrameTime();
+
+		if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyReleased(KEY_R))
+		{
+			scene->free();
+			scene->init();
+		}
+
+
 		scene->update(dt);
 
 		pTimer += dt;
@@ -121,6 +129,7 @@ int main(int argc, char** argv)
 			pTimer = 0.0f;
 			scene->fixedUpdate(pTimeLimit);
 		}
+
 
 
 		BeginDrawing();
