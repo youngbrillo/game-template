@@ -17,3 +17,4 @@ project(basename)
 
     IncludeVendor("raylib")
     IncludeVendor("yaml-cpp")
+    IncludeVendor("imgui")

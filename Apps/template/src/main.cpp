@@ -6,6 +6,7 @@
 #include "lib/core/uuid.hpp"
 
 #include "lib/utils/yaml_common.hpp"
+#include "lib/utils/editor_utils.hpp"
 
 struct AppConfig
 {
@@ -86,7 +87,6 @@ struct AppConfig
 int main(int argc, char** argv)
 {
 	AppConfig config = AppConfig::LoadFromFile("app.config.yaml");
-
 	SetConfigFlags(config.window.flags);
 	InitWindow(config.window.width, config.window.height, config.name.c_str());
 	if (config.window.monitor < GetMonitorCount())
@@ -101,8 +101,9 @@ int main(int argc, char** argv)
 
 	lib::Transform3D transform;
 	transform.position.y = 0.5f;
+	bool show_imgui_demo = true;
 
-
+	lib::EditorBegin();
 	while (!WindowShouldClose())
 	{
 		float dt = GetFrameTime();
@@ -124,10 +125,16 @@ int main(int argc, char** argv)
 		EndMode3D();
 
 		DrawText("Template", 10, 10, 20, RAYWHITE);
+		lib::EditorBeginDraw();
+		if (show_imgui_demo)
+			ImGui::ShowDemoWindow(&show_imgui_demo);
+
+		lib::EditorEndDraw();
 		EndDrawing();
 	}
 	UnloadModel(model);
 	config.save("app.config.yaml");
+	lib::EditorEnd();
 	CloseWindow();
 	return 0;
 }

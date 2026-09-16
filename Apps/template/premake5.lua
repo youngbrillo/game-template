@@ -42,7 +42,9 @@ project(basename)
     LinkToLibrary("lib")
 
     IncludeVendor("yaml-cpp")
+    IncludeVendor("imgui")
 
     LinkVendor("raylib")
     LinkVendor("yaml-cpp")
+    LinkVendor("imgui")
 
