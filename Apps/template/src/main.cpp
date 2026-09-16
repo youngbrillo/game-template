@@ -3,10 +3,10 @@
 
 #include "lib/components/transform3d.hpp"
 #include "lib/components/sceneCamera3d.hpp"
-#include "lib/core/uuid.hpp"
 
 #include "lib/utils/yaml_common.hpp"
 #include "lib/utils/editor_utils.hpp"
+#include "scenes_registration.h"
 
 struct AppConfig
 {
@@ -84,6 +84,7 @@ struct AppConfig
 };
 
 
+
 int main(int argc, char** argv)
 {
 	AppConfig config = AppConfig::LoadFromFile("app.config.yaml");
@@ -96,35 +97,37 @@ int main(int argc, char** argv)
 	}
 	SetTargetFPS(60);
 
-	Model model = LoadModelFromMesh(GenMeshCube(1, 1, 1));
-	lib::SceneCamera3D camera;
-
-	lib::Transform3D transform;
-	transform.position.y = 0.5f;
 	bool show_imgui_demo = true;
-
 	lib::EditorBegin();
+
+	lib::SceneSettings settings = {
+		.name = "Template",
+		.configPath = "resources/scene1.yaml"
+	};
+
+
+	lib::iScene* scene = CreateTemplateScene(settings);
+
+	scene->init();
+	float pTimer = 0.0f, pTimeLimit = 1.0f / 60.0f;
 	while (!WindowShouldClose())
 	{
 		float dt = GetFrameTime();
+		scene->update(dt);
 
-		transform.RotateAroundAxis({ 0, 1, 0 }, 45 * dt);
-
-		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
-			UpdateCamera(&camera.camera, CAMERA_THIRD_PERSON);
+		pTimer += dt;
+		if (pTimer >= pTimeLimit)
+		{
+			pTimer = 0.0f;
+			scene->fixedUpdate(pTimeLimit);
+		}
 
 
 		BeginDrawing();
 		ClearBackground(BLACK);
 
-		BeginMode3D(camera);
+		scene->render();
 
-		model.transform = transform.toMatrix();
-		DrawModel(model, { 0 }, 1.0f, WHITE);
-		DrawGrid(10, 1.0f);
-		EndMode3D();
-
-		DrawText("Template", 10, 10, 20, RAYWHITE);
 		lib::EditorBeginDraw();
 		if (show_imgui_demo)
 			ImGui::ShowDemoWindow(&show_imgui_demo);
@@ -132,7 +135,10 @@ int main(int argc, char** argv)
 		lib::EditorEndDraw();
 		EndDrawing();
 	}
-	UnloadModel(model);
+	scene->free();
+	delete scene;
+	scene = nullptr;
+
 	config.save("app.config.yaml");
 	lib::EditorEnd();
 	CloseWindow();

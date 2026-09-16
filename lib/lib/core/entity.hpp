@@ -3,6 +3,12 @@
 #include "uuid.hpp"
 #include <string>
 
+namespace YAML
+{
+    class Emitter;
+    class Node;
+}
+
 namespace lib
 {
     namespace components
