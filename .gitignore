@@ -371,4 +371,4 @@ FodyWeavers.xsd
 /imgui.ini
 *.ini
 
-/Apps/template/app.config.yaml
+/Apps/**/app.config.yaml
