@@ -8,9 +8,16 @@ namespace YAML
     class Emitter;
     class Node;
 }
-
 namespace lib
 {
+    class Entity;
+
+    typedef void(*SerializeEntityCallback)(YAML::Emitter& out, Entity& e);
+    typedef void(*DeserializeEntityCallback)(const YAML::Node& root, Entity& e);
+
+    void SetSerializeEntityCallback(SerializeEntityCallback callback);
+    void SetDeserializeEntityCallback(DeserializeEntityCallback callback);
+
     namespace components
     {
         struct NameTag { std::string name = "entity"; };
@@ -73,6 +80,10 @@ namespace lib
         void enableSerialization();
 
         Entity duplicate();
+
+        void Serialize(YAML::Emitter& out);
+
+        void Deserialize(const YAML::Node& node);
 
         Entity createChild(std::string name);
 
@@ -208,4 +219,8 @@ namespace lib
             _world->remove<T>(_handle);
         }
     }
+
+    static void DragSource(const char* label, Entity e);
+    static bool DropTarget(Entity& e, entt::registry& world);
 }
+

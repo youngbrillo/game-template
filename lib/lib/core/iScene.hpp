@@ -28,13 +28,13 @@ namespace lib
 		virtual void fixedUpdate(float timestep) = 0;
 		virtual void render() = 0;
 
-		void SaveToFile(std::string filepath);
+		void SaveToFile(const std::string& filepath);
 		void SaveToOutput(YAML::Emitter& out);
 
-		void LoadFromFile(std::string filepath);
+		void LoadFromFile(const std::string& filepath);
 		void LoadFromOutput(const YAML::Node& root);
 	protected:
-		virtual void onDataSave(YAML::Emitter& root) {}
+		virtual void onDataSave(YAML::Emitter& out) {}
 		virtual void onDataLoad(const YAML::Node& root) {}
 	};
 }

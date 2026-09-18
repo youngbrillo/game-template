@@ -1,6 +1,7 @@
 #include "scenes_registration.h"
 #include "lib/components/transform3d.hpp"
 #include "lib/components/sceneCamera3d.hpp"
+#include "lib/utils/yaml_common.hpp"
 #include "lib/utils/random_funcs.hpp"
 #include <box3d/box3d.h>
 
@@ -42,6 +43,20 @@ namespace lib
 	{
 		int meshId = 0;
 		Color tint = RAYWHITE;
+
+		void Serialize(YAML::Emitter& out)
+		{
+			out << YAML::Flow << YAML::BeginMap
+				<< YAML::Key << "id" << meshId
+				<< YAML::Key << "tint" << tint
+				<< YAML::EndMap;
+		}
+
+		void Deserialize(const YAML::Node& node)
+		{
+			bool n = readYamlValue(node["id"], &meshId);
+			bool k = readYamlValue(node["tint"], &tint);
+		}
 	};
 	struct RigidBodyComponent
 	{
@@ -58,6 +73,24 @@ namespace lib
 			id = b3CreateBody(worldId, &def);
 		}
 
+		void Serialize(YAML::Emitter& out)
+		{
+			int _type = type;
+
+			out << YAML::Flow << YAML::BeginMap
+				<< YAML::Key << "type" << _type
+				<< YAML::EndMap;
+		}
+
+		void Deserialize(const YAML::Node& node)
+		{
+			int _type = type;
+			if (readYamlValue(node["type"], &_type))
+			{
+				type = (b3BodyType)_type;
+			}
+			
+		}
 	};
 	struct BoxCollider
 	{
@@ -76,7 +109,60 @@ namespace lib
 			id = b3CreateHullShape(bodyId, &def, &hull.base);
 		}
 
+		void Serialize(YAML::Emitter& out)
+		{
+			out << YAML::Flow << YAML::BeginMap
+				<< YAML::Key << "restitution" << restitution
+				<< YAML::Key << "friction" << friction
+				<< YAML::EndMap;
+		}
+
+		void Deserialize(const YAML::Node& node)
+		{
+			readYamlValue(node["restitution"], &restitution);
+			readYamlValue(node["friction"], &friction);
+		}
 	};
+
+	void SerializeAppComponents(YAML::Emitter& out, Entity& e)
+	{
+
+		if (auto* c = e.tryGet<MeshRefComponent>())
+		{
+			out << YAML::Key << "MeshRefComponent" << YAML::Value;
+			c->Serialize(out);
+		}
+		if (auto* c = e.tryGet<RigidBodyComponent>())
+		{
+			out << YAML::Key << "RigidBodyComponent" << YAML::Value;
+			c->Serialize(out);
+		}
+		if (auto* c = e.tryGet<BoxCollider>())
+		{
+			out << YAML::Key << "BoxCollider" << YAML::Value;
+			c->Serialize(out);
+		}
+	}
+
+
+	void DeserializeAppComponents(const YAML::Node& root, Entity& e)
+	{
+		if (auto node = root["MeshRefComponent"])
+		{
+			auto& c = e.add<MeshRefComponent>();
+			c.Deserialize(node);
+		}
+		if (auto node = root["RigidBodyComponent"])
+		{
+			auto& c = e.add<RigidBodyComponent>();
+			c.Deserialize(node);
+		}
+		if (auto node = root["BoxCollider"])
+		{
+			auto& c = e.add<BoxCollider>();
+			c.Deserialize(node);
+		}
+	}
 
 	struct SphereCollider
 	{
@@ -112,6 +198,9 @@ namespace lib
 			models[0] = LoadModelFromMesh(GenMeshCube(1, 1, 1));
 			models[1] = LoadModelFromMesh(GenMeshSphere(0.5f, 16, 16));
 			camera.camera.position = Vector3{ 50,15,35 };
+
+			SetSerializeEntityCallback(SerializeAppComponents);
+			SetDeserializeEntityCallback(DeserializeAppComponents);
 		}
 		~TemplateScene()
 		{
@@ -124,7 +213,18 @@ namespace lib
 
 			worldid = b3CreateWorld(&wdef);
 
+			this->LoadFromFile(settings.configPath);
 
+
+			for (auto&& [id, t, rb] : world.view<Transform3D, RigidBodyComponent>().each())
+			{
+				rb.init(worldid, t);
+			}
+
+			for (auto&& [id, t, rb, bc] : world.view<Transform3D, RigidBodyComponent, BoxCollider>().each())
+			{
+				bc.init(worldid, rb.id, t);
+			}
 			Transform3D t;
 			Vector4 tint;
 			{

@@ -1,7 +1,5 @@
 #include "transform3d.hpp"
-
-
-
+#include "lib/utils/yaml_common.hpp"
 
 namespace lib
 {
@@ -143,6 +141,23 @@ namespace lib
 	{
 		Quaternion deltaRotation = QuaternionFromAxisAngle(rotation_axis, deg_angle * DEG2RAD);
 		this->orientation = QuaternionMultiply(this->orientation, deltaRotation);
+	}
+
+
+	void Transform3D::Serialize(YAML::Emitter& out)
+	{
+		out << YAML::Flow << YAML::BeginMap
+			<< YAML::Key << "p" << position
+			<< YAML::Key << "s" << size
+			<< YAML::Key << "o" << orientation
+			<< YAML::EndMap;
+	}
+
+	void Transform3D::Deserialize(const YAML::Node& node)
+	{
+		readYamlValue(node["p"], &position);
+		readYamlValue(node["s"], &size);
+		readYamlValue(node["o"], &orientation);
 	}
 }
 

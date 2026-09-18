@@ -1,7 +1,25 @@
 #include "lib/core/entity.hpp"
+#include "lib/utils/yaml_common.hpp"
+#include <unordered_set>	//req. for make_unique_name
+#include <regex>			//req. for make_unique_name
+
+#include <lib/components/transform3d.hpp>
 
 namespace lib
 {
+	static SerializeEntityCallback writeEntityCallback = nullptr;
+	static DeserializeEntityCallback readEntityCallback = nullptr;
+
+
+	void SetSerializeEntityCallback(SerializeEntityCallback callback)
+	{
+		writeEntityCallback = callback;
+	}
+	void SetDeserializeEntityCallback(DeserializeEntityCallback callback)
+	{
+		readEntityCallback = callback;
+	}
+
 	void Entity::destroy()
 	{
 		addOrReplace<components::DeleteTag>();
@@ -10,7 +28,6 @@ namespace lib
 			Entity child = getFirstChild();
 			child.destroy();
 		}
-
 		removeParent();
 	}
 	std::string Entity::getName()
@@ -61,9 +78,164 @@ namespace lib
 	{
 		remove<components::DoNotSerializeTag>();
 	}
+
+	static std::string make_unique_name(const std::string& name, const std::unordered_set<std::string>& existing_names)
+	{
+		if (!existing_names.contains(name))
+			return name;
+
+		// Strip an existing " (number)" suffix.
+		static const std::regex suffixRegex(R"(^(.*) \((\d+)\)$)");
+
+		std::smatch match;
+		std::string baseName = name;
+		int startingIndex = 1;
+
+		if (std::regex_match(name, match, suffixRegex))
+			baseName = match[1].str();
+		if (match.size() >= 3)
+		{
+			startingIndex = std::stoi(match[2].str());
+		}
+
+
+		// Try(1), (2), (3), ...
+		for (int i = startingIndex; ; ++i)
+		{
+			std::string candidate = baseName + " (" + std::to_string(i) + ")";
+
+			if (!existing_names.contains(candidate))
+				return candidate;
+		}
+
+	}
+
 	Entity Entity::duplicate()
 	{
-		return Entity();
+		Entity e(_world->create(), _world);
+		auto& name= e.add<components::NameTag>();
+		auto& id = e.add<components::IDTag>();
+
+		YAML::Emitter output;
+		this->Serialize(output);
+		std::string input = output.c_str();
+
+		YAML::Node root = YAML::Load(input);
+
+		e.Deserialize(root);
+
+		if (hasParent())
+		{
+			e.addParent(getParent());
+		}
+
+		std::unordered_set<std::string> existing_names = {
+			name.name
+		};
+
+		name.name = make_unique_name(name.name, existing_names);
+
+
+
+		return e;
+	}
+
+	template<typename T>
+	static void WriteComponent(YAML::Emitter& out, Entity* entity, const char* label)
+	{
+		if (auto* component = entity->tryGet<T>())
+		{
+			out << YAML::Key << label << YAML::Value << *component;
+		}
+
+	}
+	template<typename T>
+	static bool ReadComponent(const YAML::Node& node, Entity* entity)
+	{
+		bool found = false;
+		if (node && entity)
+		{
+			T component;
+			ReadYamlValue(node, &component);
+			entity->add<T>(component);
+			found = true;
+		}
+
+		return false;
+	}
+
+	void Entity::Serialize(YAML::Emitter& out)
+	{
+
+		auto& name = get<components::NameTag>();
+		auto& id   = get<components::IDTag>();
+
+		out << YAML::BeginMap
+			<< YAML::Key << "entity" << YAML::Value
+			<< YAML::Flow << YAML::BeginMap
+			<< YAML::Key << "name" << YAML::Value << name.name
+			<< YAML::Key << "id" << YAML::Value << id.tag;
+		if (this->isVisible() == false) out << YAML::Key << "visible" << YAML::Value << false;
+		if (this->isEnabled() == false) out << YAML::Key << "enabled" << YAML::Value << false;
+
+		if (auto* c = tryGet<Transform3D>())
+		{
+			out << YAML::Key << "Transform3D" << YAML::Value;
+			c->Serialize(out);
+		}
+
+		if (writeEntityCallback) writeEntityCallback(out, *this);
+
+		if (auto child = getFirstChild())
+		{
+			out << YAML::Key << "children" << YAML::Value
+				<< YAML::BeginSeq;
+			while (child)
+			{
+				child.Serialize(out);
+				child = child.getNextSibling();
+			}
+			out << YAML::EndSeq;
+		}
+
+		out << YAML::EndMap;
+
+	}
+	void Entity::Deserialize(const YAML::Node& node)
+	{
+		if (auto iNode = node["entity"])
+		{
+			auto& info = get<components::NameTag>();
+			auto& id = get<components::IDTag>();
+			bool isVisible = true;
+			bool isEnabled= true;
+			readYamlValue(iNode["name"], &info.name);
+			readYamlValue(iNode["id"], &id.tag);
+			if (readYamlValue(iNode["visible"], &isVisible) && isVisible == false)
+			{
+				hide();
+			}
+			if (readYamlValue(iNode["enabled"], &isEnabled) && isEnabled == false)
+			{
+				disable();
+			}
+
+			if (auto n = node["Transform3D"])
+			{
+				auto& c = add<Transform3D>();
+				c.Deserialize(n);
+			}
+
+			if (readEntityCallback) readEntityCallback(node, *this);
+
+			if (auto children = node["children"]) {
+				for (auto child : children)
+				{
+					Entity c = createChild("nameless-child");
+					c.Deserialize(child);
+				}
+			}
+		}
 	}
 	Entity Entity::createChild(std::string name)
 	{
@@ -240,5 +412,12 @@ namespace lib
 			e.add<components::Relationship>();
 
 		return e;
+	}
+	void DragSource(const char* label, Entity e)
+	{
+	}
+	bool DropTarget(Entity& e, entt::registry& world)
+	{
+		return false;
 	}
 }

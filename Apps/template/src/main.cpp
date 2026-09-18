@@ -110,9 +110,12 @@ int main(int argc, char** argv)
 
 	scene->init();
 	float pTimer = 0.0f, pTimeLimit = 1.0f / 60.0f;
+	bool paused = false;
 	while (!WindowShouldClose())
 	{
 		float dt = GetFrameTime();
+		if (paused)
+			dt = 0.0f;
 
 		if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyReleased(KEY_R))
 		{
@@ -120,6 +123,10 @@ int main(int argc, char** argv)
 			scene->init();
 		}
 
+		if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyReleased(KEY_P))
+		{
+			paused = !paused;
+		}
 
 		scene->update(dt);
 

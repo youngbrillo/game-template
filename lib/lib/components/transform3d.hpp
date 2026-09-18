@@ -2,6 +2,11 @@
 #include <raylib.h>
 #include <raymath.h>
 
+namespace YAML
+{
+	class Emitter;
+	class Node;
+}
 namespace lib
 {
 	struct Transform3D
@@ -44,5 +49,8 @@ namespace lib
 
 		void RotateAroundAxis(Vector3 rotation_axis, float deg_angle);
 
+
+		void Serialize(YAML::Emitter& out);
+		void Deserialize(const YAML::Node& node);
 	};
 }
