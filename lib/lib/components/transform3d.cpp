@@ -1,5 +1,7 @@
 #include "transform3d.hpp"
 #include "lib/utils/yaml_common.hpp"
+#include "sol/sol.hpp"
+#include "lib/scripting/bindings/entity_extensions.hpp"
 
 namespace lib
 {
@@ -158,6 +160,30 @@ namespace lib
 		readYamlValue(node["p"], &position);
 		readYamlValue(node["s"], &size);
 		readYamlValue(node["o"], &orientation);
+	}
+
+	void Transform3D::ScriptBind(sol::state& lua)
+	{
+		namespace help = scripting::bind;
+
+		help::register_meta_component<Transform3D>();
+
+		lua.new_usertype<Transform3D>("Transform3D"
+			, "type_id", &entt::type_hash<Transform3D>::value
+			, sol::call_constructor
+			, sol::factories([]() {return Transform3D(); }, [](float x, float y, float z) {return Transform3D(Vector3{ x,y, z }); })
+			, "position", &Transform3D::position
+			, "size", &Transform3D::size
+			, "orientation", &Transform3D::orientation
+			, "GetEuler", &Transform3D::GetEuler
+			, "SetEuler", &Transform3D::SetEuler
+			, "Front", &Transform3D::Front
+			, "Right", &Transform3D::Right
+			, "Up", &Transform3D::Up
+			, "LookAt", &Transform3D::LookAt
+			, "RotateTowards", &Transform3D::RotateTowards
+			, "RotateAroundAxis", &Transform3D::RotateAroundAxis
+		);
 	}
 }
 

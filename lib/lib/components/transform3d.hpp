@@ -7,6 +7,10 @@ namespace YAML
 	class Emitter;
 	class Node;
 }
+namespace sol
+{
+	class state;
+}
 namespace lib
 {
 	struct Transform3D
@@ -52,5 +56,6 @@ namespace lib
 
 		void Serialize(YAML::Emitter& out);
 		void Deserialize(const YAML::Node& node);
+		static void ScriptBind(sol::state& lua);
 	};
 }

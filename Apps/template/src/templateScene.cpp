@@ -4,10 +4,10 @@
 #include "lib/utils/yaml_common.hpp"
 #include "lib/utils/random_funcs.hpp"
 #include <box3d/box3d.h>
+#include "lib/scripting/luaScript.hpp"
 
 namespace lib
 {
-
 	static 	b3Vec3 Vector3_to_b3Vec3(const Vector3& v)
 	{
 		b3Vec3 r;
@@ -38,7 +38,6 @@ namespace lib
 		return r;
 	}
 
-
 	struct MeshRefComponent
 	{
 		int meshId = 0;
@@ -58,6 +57,7 @@ namespace lib
 			bool k = readYamlValue(node["tint"], &tint);
 		}
 	};
+
 	struct RigidBodyComponent
 	{
 		b3BodyId id = b3_nullBodyId;
@@ -92,6 +92,7 @@ namespace lib
 			
 		}
 	};
+
 	struct BoxCollider
 	{
 		b3ShapeId id = b3_nullShapeId;
@@ -144,7 +145,6 @@ namespace lib
 		}
 	}
 
-
 	void DeserializeAppComponents(const YAML::Node& root, Entity& e)
 	{
 		if (auto node = root["MeshRefComponent"])
@@ -190,6 +190,7 @@ namespace lib
 		Model models[2];
 		lib::SceneCamera3D camera;
 		b3WorldId worldid;
+		LuaScript mainScript;
 
 	public:
 		TemplateScene(SceneSettings p_settings)
@@ -215,7 +216,6 @@ namespace lib
 
 			this->LoadFromFile(settings.configPath);
 
-
 			for (auto&& [id, t, rb] : world.view<Transform3D, RigidBodyComponent>().each())
 			{
 				rb.init(worldid, t);
@@ -225,65 +225,24 @@ namespace lib
 			{
 				bc.init(worldid, rb.id, t);
 			}
-			Transform3D t;
-			Vector4 tint;
+
+			if (mainScript.LoadFile(settings.scriptPath))
 			{
-				t.position = { 0.0f, -0.75f, 0.0f };
-				t.size   = { 60.0f, 0.5f, 60.0f };
+				mainScript.state["CreateBox"] = [=](Transform3D t, Color c) {CreateBox(t, c); };
+				mainScript.state["CreateSphere"] = [=](Vector3 v, Color c) {CreateSphere(v, c); };
 
-				Entity e = Entity::Create(world, "ground");
-				e.add<Transform3D>(t);
-				auto& mc = e.add<MeshRefComponent>();
-				mc.meshId = 0;
-				mc.tint = DARKGRAY;
-				e.disableSerialization();
-
-				auto& rb = e.add<RigidBodyComponent>();
-				rb.type = b3_staticBody;
-				rb.init(worldid, t);
-				auto& bc = e.add<BoxCollider>();
-				bc.init(worldid, rb.id, t);
-			}
-			Vector3 axis = { 0, 1, 0 };
-			t.size = { 1,1,1 };
-			for (int i = 0; i < 40; i++)
-			{
-				t.position.x = Random_float(-25.0f, 25.0f);
-				t.position.y = Random_float(15.0f, 25.0f);
-				t.position.z = Random_float(-25.0f, 25.0f);
-				
-				tint.x = Random_float(0.0f, 1.0f);
-				tint.y = Random_float(0.0f, 1.0f);
-				tint.z = Random_float(0.0f, 1.0f);
-				tint.w = Random_float(0.5f, 1.0f);
-
-				axis.x = Random_float(-1.0f, 1.0f);
-				axis.y = Random_float(-1.0f, 1.0f);
-				axis.z = Random_float(-1.0f, 1.0f);
-
-				axis = Vector3Normalize(axis);
-				t.RotateAroundAxis(axis, Random_float( -180.0f, 180.0f));
-
-				Entity e = CreateBox(t, ColorFromNormalized(tint));
-			}
-			for (int i = 0; i < 25; i++)
-			{
-				t.position.x = Random_float(-25.0f, 25.0f);
-				t.position.y = Random_float(15.0f, 25.0f);
-				t.position.z = Random_float(-25.0f, 25.0f);
-
-				tint.x = Random_float(0.0f, 1.0f);
-				tint.y = Random_float(0.0f, 1.0f);
-				tint.z = Random_float(0.0f, 1.0f);
-				tint.w = Random_float(0.5f, 1.0f);
-
-				Entity e = CreateSphere(t.position, ColorFromNormalized(tint));
+				mainScript.ExecuteScriptFunction("onInit");
 			}
 		}
 		virtual void free(){
 
+			if (mainScript.isEnabled())
+			{
+				mainScript.ExecuteScriptFunction("onFree");
+			}
 			b3DestroyWorld(worldid);
 			world.clear();
+			mainScript.free();
 		}
 		virtual void update(float dt){
 			if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
@@ -318,7 +277,6 @@ namespace lib
 				DrawModel(models[m.meshId], Vector3Zeros, 1.0f, m.tint);
 			}
 			
-			//DrawGrid(50, 10.0f);
 			EndMode3D();
 
 			DrawText(TextFormat("Scene: %s", settings.name.c_str()), 10, 10, 20, WHITE);

@@ -44,9 +44,11 @@ project(basename)
     IncludeVendor("yaml-cpp")
     IncludeVendor("imgui")
     IncludeVendor("box3D")
+    IncludeVendor("lua")
 
     LinkVendor("raylib")
     LinkVendor("yaml-cpp")
     LinkVendor("imgui")
     LinkVendor("box3D")
+    LinkVendor("lua")
 

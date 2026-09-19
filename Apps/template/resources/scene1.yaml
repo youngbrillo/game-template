@@ -1,5 +1,10 @@
 settings: {name: Template - Scene 1, config: resources/scene1.yaml, script: resources/scene1.lua}
 world:
+  - entity: {name: gound}
+    Transform3D: {p: [0, -.75, 0], s: [60, .5, 60], o: [0,0,0, 1]}
+    MeshRefComponent: {id: 0, tint: 5e5e5eff}
+    RigidBodyComponent: {type: 0}
+    BoxCollider: {restitution: .85, friction: 0.1}
   - entity: {name: panel 1}
     Transform3D: {p: [0, 10, 0], s: [10, 1, 10], o: [0,0,0, 1]}
     MeshRefComponent: {id: 0, tint: ffff00ff}
