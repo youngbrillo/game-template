@@ -1,6 +1,5 @@
 #pragma once
-#include <raylib.h>
-#include <raymath.h>
+#include "transform3d.hpp"
 
 namespace lib
 {
@@ -38,6 +37,11 @@ namespace lib
 		}
 
 		operator Camera3D() const { return camera; }
+
+		void write(YAML::Emitter& out);
+		void read(const YAML::Node& node);
+		void inspect();
+		static void Bind(sol::state& lua);
 	};
 
 }

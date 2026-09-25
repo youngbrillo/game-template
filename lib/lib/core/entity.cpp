@@ -2,8 +2,7 @@
 #include "lib/utils/yaml_common.hpp"
 #include <unordered_set>	//req. for make_unique_name
 #include <regex>			//req. for make_unique_name
-
-#include <lib/components/transform3d.hpp>
+#include <lib/components/components3d.hpp>
 
 namespace lib
 {
@@ -183,6 +182,29 @@ namespace lib
 			out << YAML::Key << "Transform3D" << YAML::Value;
 			c->Serialize(out);
 		}
+		if (auto* c = tryGet<SceneCamera3D>()){
+			out << YAML::Key << "SceneCamera3D" << YAML::Value;
+			c->write(out);
+		}
+
+		if (auto* c = tryGet<StaticMesh>())
+		{
+			out << YAML::Key << "StaticMesh" << YAML::Value;
+			c->write(out);
+		}
+		if (auto* c = tryGet<Rigidbody3D>()) {
+			out << YAML::Key << "Rigidbody3D" << YAML::Value;
+			c->write(out);
+		}
+		if (auto* c = tryGet<BoxCollider3D>()) {
+			out << YAML::Key << "BoxCollider3D" << YAML::Value;
+			c->write(out);
+		}
+		if (auto* c = tryGet<SphereCollider3D>()) {
+			out << YAML::Key << "SphereCollider3D" << YAML::Value;
+			c->write(out);
+		}
+
 
 		if (writeEntityCallback) writeEntityCallback(out, *this);
 
@@ -224,6 +246,26 @@ namespace lib
 			{
 				auto& c = add<Transform3D>();
 				c.Deserialize(n);
+			}
+			if (auto n = node["SceneCamera3D"]) {
+				auto& c = add<SceneCamera3D>();
+				c.read(n);
+			}
+			if (auto n = node["StaticMesh"]) {
+				auto& c = add<StaticMesh>();
+				c.read(n);
+			}
+			if (auto n = node["Rigidbody3D"]) {
+				auto& c = add<Rigidbody3D>();
+				c.read(n);
+			}
+			if (auto n = node["BoxCollider3D"]) {
+				auto& c = add<BoxCollider3D>();
+				c.read(n);
+			}
+			if (auto n = node["SphereCollider3D"]) {
+				auto& c = add<SphereCollider3D>();
+				c.read(n);
 			}
 
 			if (readEntityCallback) readEntityCallback(node, *this);

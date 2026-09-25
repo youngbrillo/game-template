@@ -13,6 +13,7 @@ namespace sol
 }
 namespace lib
 {
+	class Entity;
 	struct Transform3D
 	{
 		Vector3 position = { 0, 0, 0 };
@@ -56,6 +57,9 @@ namespace lib
 
 		void Serialize(YAML::Emitter& out);
 		void Deserialize(const YAML::Node& node);
+		bool inspect();
+
 		static void ScriptBind(sol::state& lua);
+		static void Inspect(Entity e, Transform3D& component);
 	};
 }

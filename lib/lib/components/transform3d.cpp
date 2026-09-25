@@ -162,6 +162,11 @@ namespace lib
 		readYamlValue(node["o"], &orientation);
 	}
 
+	bool Transform3D::inspect()
+	{
+		return false;
+	}
+
 	void Transform3D::ScriptBind(sol::state& lua)
 	{
 		namespace help = scripting::bind;
@@ -184,6 +189,9 @@ namespace lib
 			, "RotateTowards", &Transform3D::RotateTowards
 			, "RotateAroundAxis", &Transform3D::RotateAroundAxis
 		);
+	}
+	void Transform3D::Inspect(Entity e, Transform3D& component)
+	{
 	}
 }
 

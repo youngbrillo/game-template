@@ -3,187 +3,54 @@
 #include "lib/components/sceneCamera3d.hpp"
 #include "lib/utils/yaml_common.hpp"
 #include "lib/utils/random_funcs.hpp"
-#include <box3d/box3d.h>
 #include "lib/scripting/luaScript.hpp"
+#include "lib/components/components3d.hpp"
 
 namespace lib
 {
-	static 	b3Vec3 Vector3_to_b3Vec3(const Vector3& v)
-	{
-		b3Vec3 r;
-		r.x = v.x;
-		r.y = v.y;
-		r.z = v.z;
-		return r;
-	}
-
-	static 	Vector3 b3Vec3_to_Vector3(const b3Vec3& v)
-	{
-		Vector3 r;
-		r.x = v.x;
-		r.y = v.y;
-		r.z = v.z;
-		return r;
-	}
-
-	static 	b3Quat Quaternion_to_b3Quat(const Quaternion& v)
-	{
-		b3Quat r = { { v.x, v.y, v.z },v.w };
-		return r;
-	}
-
-	static 	Quaternion b3Quat_to_Quaternion(const b3Quat& v)
-	{
-		Quaternion r = { v.v.x, v.v.y, v.v.z, v.s };
-		return r;
-	}
-
-	struct MeshRefComponent
-	{
-		int meshId = 0;
-		Color tint = RAYWHITE;
-
-		void Serialize(YAML::Emitter& out)
-		{
-			out << YAML::Flow << YAML::BeginMap
-				<< YAML::Key << "id" << meshId
-				<< YAML::Key << "tint" << tint
-				<< YAML::EndMap;
-		}
-
-		void Deserialize(const YAML::Node& node)
-		{
-			bool n = readYamlValue(node["id"], &meshId);
-			bool k = readYamlValue(node["tint"], &tint);
-		}
-	};
-
-	struct RigidBodyComponent
-	{
-		b3BodyId id = b3_nullBodyId;
-		b3BodyType type = b3BodyType::b3_staticBody;
-		
-		void init(b3WorldId worldId, const Transform3D& t)
-		{
-			b3BodyDef def = b3DefaultBodyDef();
-			def.type = type;
-			def.position = Vector3_to_b3Vec3(t.position);
-			def.rotation = Quaternion_to_b3Quat(QuaternionNormalize(t.orientation));
-
-			id = b3CreateBody(worldId, &def);
-		}
-
-		void Serialize(YAML::Emitter& out)
-		{
-			int _type = type;
-
-			out << YAML::Flow << YAML::BeginMap
-				<< YAML::Key << "type" << _type
-				<< YAML::EndMap;
-		}
-
-		void Deserialize(const YAML::Node& node)
-		{
-			int _type = type;
-			if (readYamlValue(node["type"], &_type))
-			{
-				type = (b3BodyType)_type;
-			}
-			
-		}
-	};
-
-	struct BoxCollider
-	{
-		b3ShapeId id = b3_nullShapeId;
-		float restitution = 0.4f;
-		float friction = 0.4f;
-
-		void init(b3WorldId worldId, b3BodyId bodyId, const Transform3D& t)
-		{
-			b3ShapeDef def = b3DefaultShapeDef();
-			def.baseMaterial.friction = friction;
-			def.baseMaterial.restitution = restitution;
-
-
-			b3BoxHull hull = b3MakeBoxHull(t.size.x * 0.5f, t.size.y * 0.5f, t.size.z * 0.5f);
-			id = b3CreateHullShape(bodyId, &def, &hull.base);
-		}
-
-		void Serialize(YAML::Emitter& out)
-		{
-			out << YAML::Flow << YAML::BeginMap
-				<< YAML::Key << "restitution" << restitution
-				<< YAML::Key << "friction" << friction
-				<< YAML::EndMap;
-		}
-
-		void Deserialize(const YAML::Node& node)
-		{
-			readYamlValue(node["restitution"], &restitution);
-			readYamlValue(node["friction"], &friction);
-		}
-	};
-
 	void SerializeAppComponents(YAML::Emitter& out, Entity& e)
 	{
 
-		if (auto* c = e.tryGet<MeshRefComponent>())
-		{
-			out << YAML::Key << "MeshRefComponent" << YAML::Value;
-			c->Serialize(out);
-		}
-		if (auto* c = e.tryGet<RigidBodyComponent>())
-		{
-			out << YAML::Key << "RigidBodyComponent" << YAML::Value;
-			c->Serialize(out);
-		}
-		if (auto* c = e.tryGet<BoxCollider>())
-		{
-			out << YAML::Key << "BoxCollider" << YAML::Value;
-			c->Serialize(out);
-		}
+		//if (auto* c = e.tryGet<MeshRefComponent>())
+		//{
+		//	out << YAML::Key << "MeshRefComponent" << YAML::Value;
+		//	c->Serialize(out);
+		//}
+		//if (auto* c = e.tryGet<RigidBodyComponent>())
+		//{
+		//	out << YAML::Key << "RigidBodyComponent" << YAML::Value;
+		//	c->Serialize(out);
+		//}
+		//if (auto* c = e.tryGet<BoxCollider>())
+		//{
+		//	out << YAML::Key << "BoxCollider" << YAML::Value;
+		//	c->Serialize(out);
+		//}
 	}
 
 	void DeserializeAppComponents(const YAML::Node& root, Entity& e)
 	{
 		if (auto node = root["MeshRefComponent"])
 		{
-			auto& c = e.add<MeshRefComponent>();
-			c.Deserialize(node);
+			auto& c = e.add<StaticMesh>();
+			c.read(node);
 		}
 		if (auto node = root["RigidBodyComponent"])
 		{
-			auto& c = e.add<RigidBodyComponent>();
-			c.Deserialize(node);
+			auto& c = e.add<Rigidbody3D>();
+			c.read(node);
 		}
 		if (auto node = root["BoxCollider"])
 		{
-			auto& c = e.add<BoxCollider>();
-			c.Deserialize(node);
+			auto& c = e.add<BoxCollider3D>();
+			c.read(node);
+		}
+		if (auto node = root["SphereCollider"])
+		{
+			auto& c = e.add<SphereCollider3D>();
+			c.read(node);
 		}
 	}
-
-	struct SphereCollider
-	{
-		b3ShapeId id = b3_nullShapeId;
-		float restitution = 0.4f;
-		float friction = 0.4f;
-
-		void init(b3WorldId worldId, b3BodyId bodyId, const Transform3D& t)
-		{
-			b3ShapeDef def = b3DefaultShapeDef();
-			def.baseMaterial.friction = friction;
-			def.baseMaterial.restitution = restitution;
-
-			b3Sphere sphere = {
-				.center = {0.0f, 0.0f, 0.0f},
-				.radius = t.size.x * 0.5f
-			};
-
-			id = b3CreateSphereShape(bodyId, &def, &sphere);
-		}
-	};
 
 	class TemplateScene : public iScene
 	{
@@ -216,14 +83,19 @@ namespace lib
 
 			this->LoadFromFile(settings.configPath);
 
-			for (auto&& [id, t, rb] : world.view<Transform3D, RigidBodyComponent>().each())
+			for (auto&& [id, t, rb] : world.view<Transform3D, Rigidbody3D>().each())
 			{
-				rb.init(worldid, t);
+				rb.init(worldid, t, (uint32_t)id);
 			}
 
-			for (auto&& [id, t, rb, bc] : world.view<Transform3D, RigidBodyComponent, BoxCollider>().each())
+			for (auto&& [id, t, rb, bc] : world.view<Transform3D, Rigidbody3D, BoxCollider3D>().each())
 			{
-				bc.init(worldid, rb.id, t);
+				bc.init(rb.id, t.size, (uint32_t)id);
+			}
+
+			for (auto&& [id, t, rb, bc] : world.view<Transform3D, Rigidbody3D, SphereCollider3D>().each())
+			{
+				bc.init(rb.id, t.size, (uint32_t)id);
 			}
 
 			if (mainScript.LoadFile(settings.scriptPath))
@@ -249,32 +121,18 @@ namespace lib
 				UpdateCamera(&camera.camera, CAMERA_THIRD_PERSON);
 		}
 		virtual void fixedUpdate(float timestep){
+
 			b3World_Step(worldid, timestep, 4);
-			auto view = world.view<Transform3D, const RigidBodyComponent>().each();
-
-			for (auto&& [id, transform, body] : view)
-			{
-				b3Vec3 b_pos = b3Body_GetPosition(body.id);
-				b3Quat b_qut = b3Body_GetRotation(body.id);
-
-				transform.position.x = b_pos.x;
-				transform.position.y = b_pos.y;
-				transform.position.z = b_pos.z;
-
-				transform.orientation.x = b_qut.v.x;
-				transform.orientation.y = b_qut.v.y;
-				transform.orientation.z = b_qut.v.z;
-				transform.orientation.w = b_qut.s;
-			}
+			world.view<Transform3D, Rigidbody3D>().each(Rigidbody3D::FixedUpdate);
 
 		}
 		virtual void render(){
 			BeginMode3D(camera);
 
-			auto view = world.view<const Transform3D, const MeshRefComponent>().each();
+			auto view = world.view<const Transform3D, const StaticMesh>().each();
 			for (auto&& [id, t, m] : view) {
-				models[m.meshId].transform = t.toMatrix();
-				DrawModel(models[m.meshId], Vector3Zeros, 1.0f, m.tint);
+				models[m.id].transform = t.toMatrix();
+				DrawModel(models[m.id], Vector3Zeros, 1.0f, m.tint);
 			}
 			
 			EndMode3D();
@@ -286,16 +144,16 @@ namespace lib
 		{
 			Entity e = Entity::Create(world, "box");
 			e.add<Transform3D>(t);
-			auto& mc = e.add<MeshRefComponent>();
-			mc.meshId = 0;
+			auto& mc = e.add<StaticMesh>();
+			mc.id= 0;
 			mc.tint = tint;
 			e.disableSerialization();
 
-			auto& rb = e.add<RigidBodyComponent>();
+			auto& rb = e.add<Rigidbody3D>();
 				rb.type = b3_dynamicBody;
-				rb.init(worldid, t);
-			auto& bc = e.add<BoxCollider>();
-				bc.init(worldid, rb.id, t);
+				rb.init(worldid, t, e);
+			auto& bc = e.add<BoxCollider3D>();
+				bc.init(rb.id, t.size, e);
 			return e;
 		}
 
@@ -303,17 +161,17 @@ namespace lib
 		{
 			Entity e = Entity::Create(world, "box");
 			auto& t = e.add<Transform3D>(p_position);
-			auto& mc = e.add<MeshRefComponent>();
-			mc.meshId = 1;
+			auto& mc = e.add<StaticMesh>();
+			mc.id = 1;
 			mc.tint = tint;
 			e.disableSerialization();
 
-			auto& rb = e.add<RigidBodyComponent>();
+			auto& rb = e.add<Rigidbody3D>();
 				rb.type = b3_dynamicBody;
-				rb.init(worldid, t);
+				rb.init(worldid, t, e);
 
-			auto& bc = e.add<SphereCollider>();
-				bc.init(worldid, rb.id, t);
+			auto& bc = e.add<SphereCollider3D>();
+				bc.init(rb.id, t.size, e);
 
 			return e;
 		}
