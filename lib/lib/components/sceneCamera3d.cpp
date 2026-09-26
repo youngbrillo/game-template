@@ -38,4 +38,40 @@ namespace lib
 			, "camera", &SceneCamera3D::camera
 		);
 	}
+	void CameraController3D::write(YAML::Emitter& out)
+	{
+		out << YAML::Flow << YAML::BeginMap
+			<< YAML::Key << "enabled" << YAML::Value << enabled
+			<< YAML::Key << "mode" << YAML::Value << mode
+			<< YAML::EndMap;
+	}
+	void CameraController3D::read(const YAML::Node& node)
+	{
+		readYamlValue(node["enabled"], &enabled);
+		readYamlValue(node["mode"], &mode);
+
+	}
+	void CameraController3D::inspect()
+	{
+		ImGui::Checkbox("enabled", &enabled);
+
+		if (ImGui::RadioButton("Free", mode == CAMERA_FREE)) mode = CAMERA_FREE;
+		if (ImGui::RadioButton("Orbital", mode == CAMERA_ORBITAL)) mode = CAMERA_ORBITAL;
+		if (ImGui::RadioButton("First Person", mode == CAMERA_FIRST_PERSON)) mode = CAMERA_FIRST_PERSON;
+		if (ImGui::RadioButton("Third Person", mode == CAMERA_THIRD_PERSON)) mode = CAMERA_THIRD_PERSON;
+
+	}
+	void CameraController3D::Bind(sol::state& lua)
+	{
+		namespace help = scripting::bind;
+		help::register_meta_component<CameraController3D>();
+
+		lua.new_usertype<CameraController3D>("CameraController3D"
+			, "type_id", &entt::type_hash<CameraController3D>::value
+			, sol::call_constructor
+			, sol::factories([]() {return CameraController3D(); })
+			, "enabled", &CameraController3D::enabled
+			, "mode", &CameraController3D::mode
+		);
+	}
 }

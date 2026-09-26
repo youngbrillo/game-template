@@ -64,6 +64,8 @@ namespace lib
 		auto deleted = world.view<components::DeleteTag>();
 		world.destroy(deleted.begin(), deleted.end());
 
+		world.view<SceneCamera3D, CameraController3D>().each(CameraController3D::Update);
+
 		this->onUpdate(dt);
 	}
 	void Scene3D::fixedUpdate(float timestep)

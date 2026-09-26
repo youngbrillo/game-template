@@ -202,11 +202,14 @@ namespace lib
 			out << YAML::Key << "Transform3D" << YAML::Value;
 			c->Serialize(out);
 		}
-		if (auto* c = tryGet<SceneCamera3D>()){
+		if (auto* c = tryGet<SceneCamera3D>()) {
 			out << YAML::Key << "SceneCamera3D" << YAML::Value;
 			c->write(out);
 		}
-
+		if (auto* c = tryGet<CameraController3D>()) {
+			out << YAML::Key << "CameraController3D" << YAML::Value;
+			c->write(out);
+		}
 		if (auto* c = tryGet<StaticMesh>())
 		{
 			out << YAML::Key << "StaticMesh" << YAML::Value;
@@ -271,6 +274,11 @@ namespace lib
 				auto& c = add<SceneCamera3D>();
 				c.read(n);
 			}
+			if (auto n = node["CameraController3D"]) {
+				auto& c = add<CameraController3D>();
+				c.read(n);
+			}
+			
 			if (auto n = node["StaticMesh"]) {
 				auto& c = add<StaticMesh>();
 				c.read(n);
@@ -346,6 +354,8 @@ namespace lib
 				RenderComponentPopupMenuItem<Transform3D>("Transform 3D", *this);
 				RenderComponentPopupMenuItem<StaticMesh>("Static Mesh", *this);
 				RenderComponentPopupMenuItem<SceneCamera3D>("Scene Camera 3D", *this);
+				RenderComponentPopupMenuItem<CameraController3D>("Camera Controller 3D", *this);
+
 				//RenderComponentPopupMenuItem<SceneCamera3DThirdPersonController>("Scene Camera 3D Thirdperson Controller", *this);
 
 				if (ImGui::BeginMenu("Physics"))
@@ -371,6 +381,7 @@ namespace lib
 		RenderComponentEditWidget<BoxCollider3D>("Box Collider 3D", *this, BoxCollider3D::Inspect);
 		RenderComponentEditWidget<SphereCollider3D>("Sphere Collider 3D", *this, SphereCollider3D::Inspect);
 		RenderComponentEditWidget<SceneCamera3D>("Scene Camera 3D", *this, EntityQuickInspctor<SceneCamera3D>);
+		RenderComponentEditWidget<CameraController3D>("Camera Controller 3D", *this, EntityQuickInspctor<CameraController3D>);
 
 		if (widgetCallback) widgetCallback(*this);
 	}
@@ -593,6 +604,13 @@ namespace lib
 		if (ImGui::MenuItem("Scene Camera")) {
 			Entity e = Entity::Create(world, "Scene Camera");
 			auto& camera = e.add<SceneCamera3D>();
+			selected_entity = e;
+		}
+
+		if (ImGui::MenuItem("Editor Camera")) {
+			Entity e = Entity::Create(world, "Editor Camera");
+			auto& camera = e.add<SceneCamera3D>();
+			auto& controller = e.add<CameraController3D>();
 			selected_entity = e;
 		}
 

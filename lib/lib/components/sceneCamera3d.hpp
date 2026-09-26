@@ -44,4 +44,29 @@ namespace lib
 		static void Bind(sol::state& lua);
 	};
 
+	struct CameraController3D
+	{
+		bool enabled = true;
+		int mode = CameraMode::CAMERA_FREE;
+
+		inline void update(SceneCamera3D& p_camera)
+		{
+			if (enabled && IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+			{
+				UpdateCamera(&p_camera.camera, mode);
+			}
+		}
+
+
+
+		void write(YAML::Emitter& out);
+		void read(const YAML::Node& node);
+		void inspect();
+		static void Bind(sol::state& lua);
+		inline static void Update(SceneCamera3D& p_camera, CameraController3D p_controller)
+		{
+			p_controller.update(p_camera);
+		}
+	};
+
 }
