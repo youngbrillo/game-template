@@ -11,45 +11,11 @@ namespace lib
 	void SerializeAppComponents(YAML::Emitter& out, Entity& e)
 	{
 
-		//if (auto* c = e.tryGet<MeshRefComponent>())
-		//{
-		//	out << YAML::Key << "MeshRefComponent" << YAML::Value;
-		//	c->Serialize(out);
-		//}
-		//if (auto* c = e.tryGet<RigidBodyComponent>())
-		//{
-		//	out << YAML::Key << "RigidBodyComponent" << YAML::Value;
-		//	c->Serialize(out);
-		//}
-		//if (auto* c = e.tryGet<BoxCollider>())
-		//{
-		//	out << YAML::Key << "BoxCollider" << YAML::Value;
-		//	c->Serialize(out);
-		//}
 	}
 
 	void DeserializeAppComponents(const YAML::Node& root, Entity& e)
 	{
-		if (auto node = root["MeshRefComponent"])
-		{
-			auto& c = e.add<StaticMesh>();
-			c.read(node);
-		}
-		if (auto node = root["RigidBodyComponent"])
-		{
-			auto& c = e.add<Rigidbody3D>();
-			c.read(node);
-		}
-		if (auto node = root["BoxCollider"])
-		{
-			auto& c = e.add<BoxCollider3D>();
-			c.read(node);
-		}
-		if (auto node = root["SphereCollider"])
-		{
-			auto& c = e.add<SphereCollider3D>();
-			c.read(node);
-		}
+
 	}
 
 	class TemplateScene : public iScene

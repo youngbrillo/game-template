@@ -2,71 +2,71 @@ settings: {name: Template - Scene 1, config: resources/scene1.yaml, script: reso
 world:
   - entity: {name: gound}
     Transform3D: {p: [0, -.75, 0], s: [60, .5, 60], o: [0,0,0, 1]}
-    MeshRefComponent: {id: 0, tint: 5e5e5eff}
-    RigidBodyComponent: {type: 0}
-    BoxCollider: {restitution: .85, friction: 0.1}
+    StaticMesh: {id: 0, tint: 5e5e5eff}
+    Rigidbody3D: {type: 0}
+    BoxCollider3D: {restitution: .85, friction: 0.1}
   - entity: {name: panel 1}
     Transform3D: {p: [0, 10, 0], s: [10, 1, 10], o: [0,0,0, 1]}
-    MeshRefComponent: {id: 0, tint: ffff00ff}
-    RigidBodyComponent: {type: 0}
-    BoxCollider: {restitution: .85, friction: 0.1}
+    StaticMesh: {id: 0, tint: ffff00ff}
+    Rigidbody3D: {type: 0}
+    BoxCollider3D: {restitution: .85, friction: 0.1}
   - entity: {name: panel 2}
     Transform3D: {p: [20, 10, 0], s: [10, 1, 10], o: [0,0,0, 1]}
-    MeshRefComponent: {id: 0, tint: ffff00ff}
-    RigidBodyComponent: {type: 0}
-    BoxCollider: {restitution: .85, friction: 0.1}
+    StaticMesh: {id: 0, tint: ffff00ff}
+    Rigidbody3D: {type: 0}
+    BoxCollider3D: {restitution: .85, friction: 0.1}
   - entity: {name: panel 3}
     Transform3D: {p: [20, 10, 20], s: [10, 1, 10], o: [0,0,0, 1]}
-    MeshRefComponent: {id: 0, tint: ffff00ff}
-    RigidBodyComponent: {type: 0}
-    BoxCollider: {restitution: .85, friction: 0.1}
+    StaticMesh: {id: 0, tint: ffff00ff}
+    Rigidbody3D: {type: 0}
+    BoxCollider3D: {restitution: .85, friction: 0.1}
   - entity: {name: panel 4}
     Transform3D: {p: [-20, 10, 0], s: [10, 1, 10], o: [0,0,0, 1]}
-    MeshRefComponent: {id: 0, tint: ffff00ff}
-    RigidBodyComponent: {type: 0}
-    BoxCollider: {restitution: .85, friction: 0.1}
+    StaticMesh: {id: 0, tint: ffff00ff}
+    Rigidbody3D: {type: 0}
+    BoxCollider3D: {restitution: .85, friction: 0.1}
   - entity: {name: panel 5}
     Transform3D: {p: [20, 10, -20], s: [10, 1, 10], o: [0,0,0, 1]}
-    MeshRefComponent: {id: 0, tint: 00ffffff}
-    RigidBodyComponent: {type: 0}
-    BoxCollider: {restitution: .85, friction: 0.1}
+    StaticMesh: {id: 0, tint: 00ffffff}
+    Rigidbody3D: {type: 0}
+    BoxCollider3D: {restitution: .85, friction: 0.1}
   - entity: {name: panel 6}
     Transform3D: {p: [-20, 10, -20], s: [10, 1, 10], o: [0,0,0, 1]}
-    MeshRefComponent: {id: 0, tint: 00ffffff}
-    RigidBodyComponent: {type: 0}
-    BoxCollider: {restitution: .85, friction: 0.1}
+    StaticMesh: {id: 0, tint: 00ffffff}
+    Rigidbody3D: {type: 0}
+    BoxCollider3D: {restitution: .85, friction: 0.1}
   - entity: {name: panel 7}
     Transform3D: {p: [-20, 10, 20], s: [10, 1, 10], o: [0,0,0, 1]}
-    MeshRefComponent: {id: 0, tint: 00ffffff}
-    RigidBodyComponent: {type: 0}
-    BoxCollider: {restitution: .85, friction: 0.1}
+    StaticMesh: {id: 0, tint: 00ffffff}
+    Rigidbody3D: {type: 0}
+    BoxCollider3D: {restitution: .85, friction: 0.1}
   - entity: {name: panel 8}
     Transform3D: {p: [0, 15, 20], s: [10, 1, 10], o: [0,0,0, 1]}
-    MeshRefComponent: {id: 0, tint: ff00ffff}
-    RigidBodyComponent: {type: 0}
-    BoxCollider: {restitution: .85, friction: 0.1}
+    StaticMesh: {id: 0, tint: ff00ffff}
+    Rigidbody3D: {type: 0}
+    BoxCollider3D: {restitution: .85, friction: 0.1}
   - entity: {name: panel 9}
     Transform3D: {p: [0, 15, -20], s: [10, 1, 10], o: [0,0,0, 1]}
-    MeshRefComponent: {id: 0, tint: ff00ffff}
-    RigidBodyComponent: {type: 0}
-    BoxCollider: {restitution: .85, friction: 0.1}
+    StaticMesh: {id: 0, tint: ff00ffff}
+    Rigidbody3D: {type: 0}
+    BoxCollider3D: {restitution: .85, friction: 0.1}
   - entity: {name: wall 1}
     Transform3D: {p: [0, 9, -30], s: [60, 20, 1], o: [0,0,0, 1]}
-    # MeshRefComponent: {id: 0, tint: 5e5e5eff}
-    RigidBodyComponent: {type: 0}
-    BoxCollider: {restitution: .85, friction: 0.1}
+    # StaticMesh: {id: 0, tint: 5e5e5eff}
+    Rigidbody3D: {type: 0}
+    BoxCollider3D: {restitution: .85, friction: 0.1}
   - entity: {name: wall 2}
     Transform3D: {p: [0, 9, 30], s: [60, 20, 1], o: [0,0,0, 1]}
-    # MeshRefComponent: {id: 0, tint: 5e5e5eff}
-    RigidBodyComponent: {type: 0}
-    BoxCollider: {restitution: .85, friction: 0.1}
+    # StaticMesh: {id: 0, tint: 5e5e5eff}
+    Rigidbody3D: {type: 0}
+    BoxCollider3D: {restitution: .85, friction: 0.1}
   - entity: {name: wall 3}
     Transform3D: {p: [30, 9, 0], s: [1, 20, 60], o: [0,0,0, 1]}
-    # MeshRefComponent: {id: 0, tint: 5e5e5eff}
-    RigidBodyComponent: {type: 0}
-    BoxCollider: {restitution: .85, friction: 0.1}
+    # StaticMesh: {id: 0, tint: 5e5e5eff}
+    Rigidbody3D: {type: 0}
+    BoxCollider3D: {restitution: .85, friction: 0.1}
   - entity: {name: wall 4}
     Transform3D: {p: [-30, 9, 0], s: [1, 20, 60], o: [0,0,0, 1]}
-    # MeshRefComponent: {id: 0, tint: 5e5e5eff}
-    RigidBodyComponent: {type: 0}
-    BoxCollider: {restitution: .85, friction: 0.1}
+    # StaticMesh: {id: 0, tint: 5e5e5eff}
+    Rigidbody3D: {type: 0}
+    BoxCollider3D: {restitution: .85, friction: 0.1}
