@@ -7,9 +7,11 @@ namespace lib
 		: iScene(p_settings)
 		, worldId(b3_nullWorldId)
 	{
+		viewport.init();
 	}
 	Scene3D::~Scene3D()
 	{
+		viewport.free();
 	}
 	void Scene3D::init()
 	{
@@ -18,7 +20,7 @@ namespace lib
 
 		this->LoadFromFile(settings.configPath);
 		this->onInit();
-
+		
 		for (auto&& [id, t, rb] : world.view<Transform3D, Rigidbody3D>().each())
 		{
 			rb.init(worldId, t, (uint32_t)id);
@@ -65,7 +67,20 @@ namespace lib
 	}
 	void Scene3D::render()
 	{
-		this->renderScene();
+		if (viewport.can_draw_to_target)
+		{
+			viewport.begin();
+				this->renderScene();
+			viewport.end();
+
+			if (viewport.can_draw_to_screen)
+			{
+				viewport.render();
+			}
+		}
+		else
+			this->renderScene();
+
 	}
 	void Scene3D::renderScene()
 	{

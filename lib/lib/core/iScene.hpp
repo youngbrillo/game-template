@@ -11,6 +11,83 @@ namespace lib
 		std::string scriptPath;
 	};
 
+	struct SceneViewport
+	{
+		int  width = 1280;
+		int  height = 720;
+		bool can_draw_to_target = true;
+		bool can_draw_to_screen = true;
+		RenderTexture2D target = { 0 };
+		Color clearColor = DARKGRAY;
+
+		inline bool isValid() const {
+			return IsRenderTextureValid(target);
+		}
+
+		inline void init()
+		{
+			free();
+			target = LoadRenderTexture(width, height);
+		}
+
+		inline void free()
+		{
+			if (isValid())
+			{
+				UnloadRenderTexture(target);
+				target = RenderTexture2D{ 0 };
+			}
+		}
+		inline void resize(int p_width, int p_height)
+		{
+			width = p_width;
+			height = p_height;
+
+			if (target.texture.width != width || target.texture.height != height)
+			{
+				init();
+			}
+		}
+		inline void begin()
+		{
+			BeginTextureMode(target);
+			ClearBackground(clearColor);
+		}
+
+		inline void end()
+		{
+			EndTextureMode();
+		}
+
+		inline static Rectangle GetCenterScreenRect_v2(Vector2 resolution, float scale) {
+			return Rectangle{
+				(GetScreenWidth() - (resolution.x * scale)) * 0.5f,
+				(GetScreenHeight() - (resolution.y * scale)) * 0.5f,
+				resolution.x * scale,
+				resolution.y * scale,
+			};
+		}
+
+		inline void render() const
+		{
+			const float v_scale = fminf((float)GetScreenWidth() / (float)width, (float)GetScreenHeight() / (float)height);
+			//draw viewport
+			Rectangle destination = GetCenterScreenRect_v2(Vector2{ (float)width, (float)height }, v_scale);
+
+			renderEx(destination);
+		}
+
+		inline void renderEx(const Rectangle& destination) const
+		{
+			DrawTexturePro(
+				target.texture,
+				Rectangle{ 0, 0, target.texture.width * 1.0f, target.texture.height * -1.0f },
+				destination,
+				Vector2{ 0.0f,0.0f }, 0.0f, WHITE
+			);
+		}
+	};
+
 	class iScene
 	{
 	public:

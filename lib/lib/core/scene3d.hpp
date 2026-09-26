@@ -12,7 +12,7 @@ namespace lib
 		SceneCamera3D default_camera;
 		LuaScript mainScript;
 		b3WorldId worldId;
-
+		SceneViewport viewport;
 	public:
 		Scene3D(SceneSettings p_settings);
 		virtual ~Scene3D();
