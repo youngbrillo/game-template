@@ -38,8 +38,9 @@ namespace lib
 		}
 
 		virtual void onScriptInitalized() override {
-			mainScript.state["CreateBox"] = [=](Transform3D t, Color c) {CreateBox(t, c); };
-			mainScript.state["CreateSphere"] = [=](Vector3 v, Color c) {CreateSphere(v, c); };
+			mainScript.state["CreateEntity"] = [=](const std::string& name) { return Entity::Create(world, name); };
+			mainScript.state["CreateBox"] = [=](Transform3D t, Color c) {return CreateBox(t, c); };
+			mainScript.state["CreateSphere"] = [=](Vector3 v, Color c) {return CreateSphere(v, c); };
 		}
 		virtual void onFree() override {
 
@@ -83,7 +84,7 @@ namespace lib
 
 		Entity CreateSphere(Vector3 p_position, Color tint = WHITE)
 		{
-			Entity e = Entity::Create(world, "box");
+			Entity e = Entity::Create(world, "sphere");
 			auto& t = e.add<Transform3D>(p_position);
 			auto& mc = e.add<StaticMesh>();
 			mc.id = 1;
@@ -113,7 +114,7 @@ namespace lib
 
 
 
-lib::iScene* CreateTemplateScene(lib::SceneSettings p_settings)
+lib::Scene3D* CreateTemplateScene(lib::SceneSettings p_settings)
 {
 	return new lib::TemplateScene(p_settings);
 }

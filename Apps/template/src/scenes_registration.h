@@ -1,4 +1,4 @@
 #pragma once 
-#include <lib/core/iScene.hpp>
+#include <lib/core/scene3d.hpp>
 
-lib::iScene* CreateTemplateScene(lib::SceneSettings p_settings);
+lib::Scene3D* CreateTemplateScene(lib::SceneSettings p_settings);

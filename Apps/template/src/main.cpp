@@ -18,6 +18,7 @@ struct AppConfig
 
 	std::string name = "Template";
 	lib::UUID id;
+
 	struct {
 		int current = 0;
 		std::vector<SceneEntry> entries;
@@ -140,6 +141,63 @@ struct AppConfig
 	const SceneEntry& GetCurrentEntry() const {
 		return scenes.entries[scenes.current];
 	}
+
+	void renderMainMenu(lib::Scene3D* scene)
+	{
+		ImGui::BeginMainMenuBar();
+		if (ImGui::BeginMenu("File"))
+		{
+			ImGui::MenuItem("New Scene", nullptr, nullptr, false);
+			ImGui::MenuItem("Open Scene", nullptr, nullptr, false);
+
+			if (ImGui::MenuItem("Save Scene", "CTRL+S", nullptr, scene != nullptr))
+			{
+				scene->SaveToFile(scene->settings.configPath);
+			}
+			if (ImGui::MenuItem("Save Scene As...", "CTRL+SHIFT+S", nullptr, scene != nullptr))
+			{
+			}
+
+			ImGui::Separator();
+
+			if (ImGui::MenuItem("Quit", "ALT+F4"))
+			{
+
+			}
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Edit"))
+		{
+			if (ImGui::MenuItem("Restart Scene", nullptr, nullptr, scene != nullptr))
+			{
+				scene->free();
+				scene->init();
+			}
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Scenes"))
+		{
+			for (int i = 0; i < scenes.entries.size(); i++)
+			{
+				if (ImGui::MenuItem(TextFormat("%s", scenes.entries[i].name.c_str())
+					, nullptr, i == scenes.current, scene != nullptr))
+				{
+					scenes.current = i;
+					scene->free();
+					scene->settings.name = this->GetCurrentEntry().name;
+					scene->settings.configPath = this->GetCurrentEntry().path;
+
+					scene->init();
+				}
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
 };
 
 int main(int argc, char** argv)
@@ -153,7 +211,7 @@ int main(int argc, char** argv)
 	};
 
 
-	lib::iScene* scene = CreateTemplateScene(settings);
+	auto* scene = CreateTemplateScene(settings);
 
 	scene->init();
 	float pTimer = 0.0f, pTimeLimit = 1.0f / 60.0f;
@@ -189,6 +247,7 @@ int main(int argc, char** argv)
 		scene->render();
 
 		lib::EditorBeginDraw();
+			config.renderMainMenu(scene);
 			scene->inspect();
 		lib::EditorEndDraw();
 		EndDrawing();

@@ -113,9 +113,9 @@ namespace lib
 
 	Entity Entity::duplicate()
 	{
-		Entity e(_world->create(), _world);
-		auto& name= e.add<components::NameTag>();
-		auto& id = e.add<components::IDTag>();
+		Entity e = Entity::Create(*_world, getName());
+		auto& name= e.get<components::NameTag>();
+		auto& id = e.get<components::IDTag>();
 
 		YAML::Emitter output;
 		this->Serialize(output);
@@ -135,7 +135,7 @@ namespace lib
 		};
 
 		name.name = make_unique_name(name.name, existing_names);
-
+		id.tag = UUID();
 
 
 		return e;
@@ -178,7 +178,7 @@ namespace lib
 			<< YAML::Key << "id" << YAML::Value << id.tag;
 		if (this->isVisible() == false) out << YAML::Key << "visible" << YAML::Value << false;
 		if (this->isEnabled() == false) out << YAML::Key << "enabled" << YAML::Value << false;
-
+		out << YAML::EndMap;
 		if (auto* c = tryGet<Transform3D>())
 		{
 			out << YAML::Key << "Transform3D" << YAML::Value;

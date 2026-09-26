@@ -49,6 +49,8 @@ function scene:create_random_spheres()
     local v = Vector3(0, 0, 0);
     local rgb = Color(0XFFFFFFFF);
 
+    local p = CreateEntity("spheres")
+    p:disableSerialization();
     for i = 1, 40, 1 do
         v:set(
             math.randomFloat(-25, 25),
@@ -59,7 +61,8 @@ function scene:create_random_spheres()
         rgb.g = math.random(0, 255)
         rgb.b = math.random(0, 255)
         
-        CreateSphere(v, rgb);
+        local child = CreateSphere(v, rgb);
+        child:addParent(p);
     end
 end
 
