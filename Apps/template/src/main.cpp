@@ -146,7 +146,6 @@ int main(int argc, char** argv)
 {
 	AppConfig config = AppConfig::LoadFromFile("app.config.yaml");
 	config.init();
-	bool show_imgui_demo = true;
 
 	lib::SceneSettings settings = {
 		.name = config.GetCurrentEntry().name,
@@ -190,9 +189,7 @@ int main(int argc, char** argv)
 		scene->render();
 
 		lib::EditorBeginDraw();
-		if (show_imgui_demo)
-			ImGui::ShowDemoWindow(&show_imgui_demo);
-
+			scene->inspect();
 		lib::EditorEndDraw();
 		EndDrawing();
 	}

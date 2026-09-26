@@ -6,6 +6,17 @@
 
 namespace lib
 {
+	struct SceneInspector
+	{
+		struct {
+			bool settings = true;
+			bool entity = true;
+			bool viewport = true;
+			bool demo = false;
+		} window;
+		Entity selected;
+	};
+
 	class Scene3D : public iScene
 	{
 	public:
@@ -13,6 +24,7 @@ namespace lib
 		LuaScript mainScript;
 		b3WorldId worldId;
 		SceneViewport viewport;
+		SceneInspector m_scene_inspector;
 	public:
 		Scene3D(SceneSettings p_settings);
 		virtual ~Scene3D();
@@ -27,13 +39,18 @@ namespace lib
 
 		const SceneCamera3D& getSceneCamera() const;
 	protected:
-		virtual void onInit() {};
-		virtual void onScriptInitalized() {};
-		virtual void onFree() {};
-		virtual void onUpdate(float dt) {};
-		virtual void onFixedUpdate(float timestep) {};
-		virtual void onRender3D(const SceneCamera3D& camera) {};
-		virtual void onRenderUI() {};
-		virtual void onInspect() {};
+		virtual void onInit() {}
+		virtual void onScriptInitalized() {}
+		virtual void onFree() {}
+		virtual void onUpdate(float dt) {}
+		virtual void onFixedUpdate(float timestep) {}
+		virtual void onRender3D(const SceneCamera3D& camera) {}
+		virtual void onRenderUI() {}
+		virtual void onInspectWindow() {}
+		virtual void onInspectSettings() {}
+	protected:
+		void inspectSettings(Entity& selected);
+		void inspectEntity(Entity& selected);
+		void inspectViewport(Entity& selected);
 	};
 }

@@ -16,7 +16,7 @@ namespace lib
 		int  width = 1280;
 		int  height = 720;
 		bool can_draw_to_target = true;
-		bool can_draw_to_screen = true;
+		bool can_draw_to_screen = false;
 		RenderTexture2D target = { 0 };
 		Color clearColor = DARKGRAY;
 

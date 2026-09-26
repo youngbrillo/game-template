@@ -3,6 +3,7 @@
 #include "imgui_stdlib.h"
 #include "ImGuizmo/ImGuizmo.h"
 #include <raymath.h>
+#include "lib/utils/yaml_common.hpp"
 
 namespace lib
 {
@@ -63,6 +64,115 @@ namespace lib
 	{
 		rlImGuiEnd();
 	}
+
+    void EditorInspectSceneEntities(entt::registry& world, Entity& selected_entity)
+    {
+        auto view = world.view<entt::entity>();
+
+        for (auto it = view.rbegin(); it != view.rend(); ++it) {
+            Entity e(*it, world);
+            if (e.hasParent())
+                continue;
+            EditorInspectEntityInHierarchy(e, selected_entity);
+        }
+    }
+
+    void EditorInspectEntityInHierarchy(Entity e, Entity& selected_entity)
+    {
+		Entity child = e.getFirstChild();
+		auto& info = e.get<components::NameTag>();
+
+		int flags = ImGuiTreeNodeFlags_OpenOnArrow
+			| ImGuiTreeNodeFlags_SpanAvailWidth
+			| ImGuiTreeNodeFlags_DrawLinesFull
+			//| ImGuiTreeNodeFlags_OpenOnDoubleClick
+			| (selected_entity == e ? ImGuiTreeNodeFlags_Selected : 0);
+
+		bool hasChildren = child;
+
+		if (hasChildren == false)
+			flags |= ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_Leaf;
+		uint32_t id = e;
+		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)id, flags, info.name.c_str());
+		// a bunch of other stuff
+		if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip))
+			ImGui::SetTooltip("id: %d", id);
+
+		if (ImGui::IsItemClicked())
+		{
+			if (e == selected_entity) {
+				selected_entity = Entity();
+			}
+			else {
+				selected_entity = e;
+			}
+		}
+
+		Entity::DragSource("Reparent:", e);
+		Entity pChild;
+
+		if (Entity::DropTarget(pChild, *e.getWorld()))
+		{
+			std::string pchild_name = pChild.getName();
+			std::string e_name = e.getName();
+			pChild.addParent(e);
+		}
+		//render popup menu -------------------------------------------------------
+		if (ImGui::BeginPopupContextItem())
+		{
+			if (ImGui::MenuItem("Inspect Components"))
+			{
+				if (selected_entity == e) {
+					selected_entity = Entity();
+				}
+				else {
+					selected_entity = e;
+				}
+			}
+
+			if (ImGui::MenuItem("Duplicate", 0, nullptr))
+			{
+				selected_entity = e.duplicate();
+			}
+
+			if (ImGui::MenuItem("Copy To Clipboard", 0, nullptr))
+			{
+				YAML::Emitter output;
+				e.Serialize(output);
+				std::string input = output.c_str();
+				SetClipboardText(input.c_str());
+				TraceLog(LOG_INFO, "Copied Contents of %s to clipboard.", e.getName().c_str());;
+			}
+			if (ImGui::MenuItem("Unparent", 0, nullptr))
+			{
+				e.removeParent();
+			}
+
+			if (ImGui::MenuItem("Delete Entity"))
+			{
+				e.destroy();
+
+				if (selected_entity == e)
+				{
+					selected_entity = Entity();
+
+				}
+			}
+			ImGui::EndPopup();
+		}
+
+		//render children -------------------------------------------------------
+		if (opened)
+		{
+			while (child)
+			{
+				EditorInspectEntityInHierarchy(child, selected_entity);
+				if (child) 
+					child = child.getNextSibling();
+			}
+			ImGui::TreePop();
+		}
+    }
 
 	bool EditorDrawTransformWidget(
         ImVec2 viewportPos, 

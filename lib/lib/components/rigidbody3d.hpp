@@ -91,6 +91,8 @@ namespace lib
 				float3_copy(&p_transform.position.x, &pos.x);
 				float4_copy(&p_transform.orientation.x, &rot.v.x);
 				b3Body_SetTransform(id, pos, rot);
+				if (type == b3BodyType::b3_dynamicBody)
+					b3Body_SetAwake(id, true);
 			}
 		}
 

@@ -3,6 +3,8 @@
 #include <unordered_set>	//req. for make_unique_name
 #include <regex>			//req. for make_unique_name
 #include <lib/components/components3d.hpp>
+#include <lib/utils/editor_utils.hpp>
+#include <imgui_stdlib.h>
 
 namespace lib
 {
@@ -279,6 +281,12 @@ namespace lib
 			}
 		}
 	}
+	void Entity::inspect()
+	{
+		auto& name_tag = get<components::NameTag>();
+		ImGui::InputText("name", &name_tag.name);
+
+	}
 	Entity Entity::createChild(std::string name)
 	{
 		Entity e = Entity::Create(*_world, name);
@@ -455,11 +463,36 @@ namespace lib
 
 		return e;
 	}
-	void DragSource(const char* label, Entity e)
+
+	static uint32_t current_dragged_entity_handle;
+
+
+	void Entity::DragSource(const char* label, Entity e)
 	{
+		if (ImGui::BeginDragDropSource()) {
+			current_dragged_entity_handle = e.getHandleInt32();
+			ImGui::SetDragDropPayload("ENTITY_PAYLOAD", &current_dragged_entity_handle, sizeof(uint32_t));
+			ImGui::Text("%s '%s'", label, e.getName().c_str());
+			ImGui::EndDragDropSource();
+		}
 	}
-	bool DropTarget(Entity& e, entt::registry& world)
+	bool Entity::DropTarget(Entity& e, entt::registry& world)
 	{
-		return false;
+
+		bool wasDropped = false;
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_PAYLOAD"))
+			{
+				uint32_t payload_entity = *(uint32_t*)payload->Data;
+				e = Entity(entt::entity{ payload_entity }, world);
+				wasDropped = true;
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+
+		return wasDropped;
 	}
 }

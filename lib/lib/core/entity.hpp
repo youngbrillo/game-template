@@ -85,6 +85,8 @@ namespace lib
 
         void Deserialize(const YAML::Node& node);
 
+        void inspect();
+
         Entity createChild(std::string name);
 
         void addParent(Entity parent);
@@ -183,6 +185,8 @@ namespace lib
 
 
         static Entity Create(entt::registry& world, std::string name);
+        static void DragSource(const char* label, Entity e);
+        static bool DropTarget(Entity& e, entt::registry& world);
     };
 
 
@@ -220,7 +224,5 @@ namespace lib
         }
     }
 
-    static void DragSource(const char* label, Entity e);
-    static bool DropTarget(Entity& e, entt::registry& world);
 }
 
