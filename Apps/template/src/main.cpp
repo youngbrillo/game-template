@@ -8,6 +8,7 @@
 #include "lib/utils/editor_utils.hpp"
 #include "scenes_registration.h"
 #include <vector>
+#include "lib/core/input_manager.hpp"
 
 struct AppConfig
 {
@@ -228,7 +229,7 @@ int main(int argc, char** argv)
 			scene->init();
 		}
 
-		if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyReleased(KEY_P))
+		if ((IsKeyDown(KEY_LEFT_CONTROL) && IsKeyReleased(KEY_P)) || lib::InputManager::isActionReleased(lib::ActionPause))
 		{
 			paused = !paused;
 		}
