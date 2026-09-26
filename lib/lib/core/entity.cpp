@@ -235,6 +235,10 @@ namespace lib
 			out << YAML::Key << "Light3D" << YAML::Value;
 			c->write(out);
 		}
+		if (auto* c = tryGet<PlayerMoverController>()) {
+			out << YAML::Key << "PlayerMoverController" << YAML::Value;
+			c->write(out);
+		}
 
 
 		if (writeEntityCallback) writeEntityCallback(out, *this);
@@ -311,6 +315,10 @@ namespace lib
 				auto& c = add<Light3D>();
 				c.read(n);
 			}
+			if (auto n = node["PlayerMoverController"]) {
+				auto& c = add<PlayerMoverController>();
+				c.read(n);
+			}
 
 			if (readEntityCallback) readEntityCallback(node, *this);
 
@@ -373,6 +381,7 @@ namespace lib
 				RenderComponentPopupMenuItem<CameraController3D>("Camera Controller 3D", *this);
 				RenderComponentPopupMenuItem<Light3DManager>("Light 3D Manager", *this);
 				RenderComponentPopupMenuItem<Light3D>("Light 3D", *this);
+				RenderComponentPopupMenuItem<PlayerMoverController>("Player Mover Controller", *this);
 
 				//RenderComponentPopupMenuItem<SceneCamera3DThirdPersonController>("Scene Camera 3D Thirdperson Controller", *this);
 
@@ -402,6 +411,7 @@ namespace lib
 		RenderComponentEditWidget<CameraController3D>("Camera Controller 3D", *this, EntityQuickInspctor<CameraController3D>);
 		RenderComponentEditWidget<Light3DManager>("Light3DManager", *this, EntityQuickInspctor<Light3DManager>);
 		RenderComponentEditWidget<Light3D>("Light3D", *this, EntityQuickInspctor<Light3D>);
+		RenderComponentEditWidget<PlayerMoverController>("Player Mover Controller", *this, PlayerMoverController::Inspect);
 
 		if (widgetCallback) widgetCallback(*this);
 	}

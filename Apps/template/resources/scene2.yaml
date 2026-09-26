@@ -1,10 +1,28 @@
-settings: {name: Template - Scene 2, config: resources/scene2.yaml, script: ""}
+settings: {name: Spiral Tower, config: resources/scene2.yaml, script: ""}
 world:
   - entity: {name: Editor Camera, id: 0X08C7C3F6F3361B13}
     SceneCamera3D: {camera: {position: [-43.405922, 43.071423, 7.442623], target: [0, 6, 0], up: [0, 1, 0], fovy: 45, projection: 0}}
     CameraController3D: {enabled: true, mode: 4}
     Light3DManager: {id: 0X0000000000000000, ownsShader: false, ambient: [0.78431374, 0.78431374, 0.78431374, 1]}
     Light3D: {index: 0, type: 0, enabled: true, color: FFFFFFFF}
+  - entity: {name: player, id: 0X1035675DE7AE2FAE}
+    Transform3D: {p: [-3.1955569, 20.555267, -12.146088], s: [1, 2, 1], o: [0, 0, 0, 1]}
+    StaticMesh: {id: 0X0000000000000002, tint: 3B7E2AFF}
+    PlayerMoverController:
+      movementSpeed: 57.6
+      jumpSpeed: 21.1
+      maxSpeed: 14.7
+      minSpeed: 0.01
+      stopSpeed: 1
+      accelerate: 30
+      friction: 4
+      gravity: 54.5
+      sprintMultiplier: 1.5
+      canClipVelocity: true
+      moveAndSlide: true
+      debugDraw: false
+      height_offset: 1.25
+      capsule: {radius: 0.3, center1: [0, -0.5, 0], center2: [0, 0.5, 0]}
   - entity: {name: ground, id: 0X7B79BA9EC4FF70A9}
     Transform3D: {p: [-12.220934, -1.9468377, -1.9762592], s: [55.907455, 0.28231278, 55.142258], o: [0, 0, 0, 1]}
     StaticMesh: {id: 0X0000000000000000, tint: 48AB69FF}

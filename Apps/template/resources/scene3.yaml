@@ -1,0 +1,92 @@
+settings: {name: Maze, config: resources/scene3.yaml, script: ""}
+world:
+  - entity: {name: Editor Camera, id: 0X08C7C3F6F3361B13}
+    SceneCamera3D: {camera: {position: [-41.163815, 18.432074, 41.22055], target: [0, 6, 0], up: [0, 1, 0], fovy: 45, projection: 0}}
+    CameraController3D: {enabled: true, mode: 4}
+    Light3DManager: {id: 0X0000000000000000, ownsShader: false, ambient: [0.78431374, 0.78431374, 0.78431374, 1]}
+    Light3D: {index: 0, type: 0, enabled: true, color: FFFFFFFF}
+  - entity: {name: player, id: 0X1035675DE7AE2FAE}
+    Transform3D: {p: [0, 6.838127, 20.43367], s: [1, 2, 1], o: [0, 0, 0, 1]}
+    StaticMesh: {id: 0X0000000000000002, tint: 3B7E2AFF}
+    PlayerMoverController:
+      movementSpeed: 10
+      jumpSpeed: 5
+      maxSpeed: 6
+      minSpeed: 0.01
+      stopSpeed: 1
+      accelerate: 30
+      friction: 4
+      gravity: 15
+      sprintMultiplier: 1.5
+      canClipVelocity: true
+      moveAndSlide: true
+      debugDraw: false
+      height_offset: 1.25
+      capsule: {radius: 0.3, center1: [0, -0.5, 0], center2: [0, 0.5, 0]}
+  - entity: {name: Env, id: 0X9FE2B309F3C65796}
+    children:
+      - entity: {name: floor, id: 0XFDFA73E50E1BA73D}
+        Transform3D: {p: [0, -0.5, 0], s: [50, 1, 50], o: [0, 0, 0, 1]}
+        StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
+        Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
+        BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}
+      - entity: {name: wall, id: 0XB93F9FD8EE8103A4}
+        Transform3D: {p: [-24.5, 3, 0], s: [1, 6, 50], o: [0, 0, 0, 1]}
+        StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
+        Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
+        BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}
+      - entity: {name: wall (1), id: 0X623A739D3F813763}
+        Transform3D: {p: [24.5, 3, 0], s: [1, 6, 50], o: [0, 0, 0, 1]}
+        StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
+        Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
+        BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}
+      - entity: {name: wall (2), id: 0X99645F08D1F0C46B}
+        Transform3D: {p: [17.5, 1.5, -12.5], s: [1, 3, 25], o: [0, 0, 0, 1]}
+        StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
+        Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
+        BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}
+      - entity: {name: wall (3), id: 0X920FFD8E540BF890}
+        Transform3D: {p: [21, 1.5, -12.5], s: [1, 3, 25], o: [0, 0, 0, 1]}
+        StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
+        Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
+        BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}
+      - entity: {name: wall (4), id: 0XB69469DE02F137B6}
+        Transform3D: {p: [14, 1.5, -12.5], s: [1, 3, 25], o: [0, 0, 0, 1]}
+        StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
+        Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
+        BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}
+      - entity: {name: wall (5), id: 0X7F3A726F3A3D0AD3}
+        Transform3D: {p: [11, 1.5, -9.5], s: [1, 3, 25], o: [0, 0, 0, 1]}
+        StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
+        Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
+        BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}
+      - entity: {name: wall (6), id: 0X062CD5E90405C249}
+        Transform3D: {p: [8, 1.5, -12.5], s: [1, 3, 25], o: [0, 0, 0, 1]}
+        StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
+        Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
+        BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}
+      - entity: {name: wall (7), id: 0X5C9615107C91B5B9}
+        Transform3D: {p: [-5, 1.5, -12.49997], s: [0.9999331, 3, 24.99806], o: [0, 0.7071085, 0, 0.70710504]}
+        StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
+        Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
+        BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}
+      - entity: {name: wall (8), id: 0X4F39099B87FCA541}
+        Transform3D: {p: [-6.5000196, 1.5, -16.499962], s: [0.9999315, 3, 24.998009], o: [0, 0.7071085, 0, 0.70710504]}
+        StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
+        Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
+        BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}
+      - entity: {name: wall (9), id: 0XB6370C05CF58D4CA}
+        Transform3D: {p: [-5.0000367, 1.5, -19.99997], s: [0.9999109, 3, 24.997349], o: [0, 0.7071085, 0, 0.70710504]}
+        StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
+        Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
+        BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}
+      - entity: {name: wall (10), id: 0X8EC9ED3045BBF48B}
+        Transform3D: {p: [-6.5000515, 1.5, -22.999962], s: [0.9999087, 3, 24.997278], o: [0, 0.7071085, 0, 0.70710504]}
+        StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
+        Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
+        BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}
+      - entity: {name: wall (7), id: 0X0C10AFE8A9DA8B8D}
+        Transform3D: {p: [-19.5, 1.5, -12.5], s: [1, 3, 25], o: [0, 0, 0, 1]}
+        StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
+        Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
+        BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}

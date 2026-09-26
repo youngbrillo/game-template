@@ -5,7 +5,7 @@
 #include "lib/utils/random_funcs.hpp"
 #include "lib/scripting/luaScript.hpp"
 
-#define MODEL_MAX 2
+#define MODEL_MAX 3
 namespace lib
 {
 	void SerializeAppComponents(YAML::Emitter& out, Entity& e)
@@ -29,6 +29,8 @@ namespace lib
 		{
 			models[0] = LoadModelFromMesh(GenMeshCube(1, 1, 1));
 			models[1] = LoadModelFromMesh(GenMeshSphere(0.5f, 16, 16));
+			models[2] = LoadModelFromMesh(GenMeshCylinder(0.5f, 1.0f, 16));
+
 			shaders[0] = LoadBasicLightingShader();
 
 			default_camera.camera.position = Vector3{ 50,15,35 };

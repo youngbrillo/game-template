@@ -66,6 +66,13 @@ namespace lib
 
 		world.view<SceneCamera3D, CameraController3D>().each(CameraController3D::Update);
 
+		auto& active_camera = this->getSceneCamera();
+
+		for (auto&& [id, transform, controller] : world.view<Transform3D, PlayerMoverController>().each())
+		{
+			Entity e(id, world);
+			controller.update(active_camera, e, transform, dt);
+		}
 		this->onUpdate(dt);
 	}
 	void Scene3D::fixedUpdate(float timestep)
@@ -73,6 +80,12 @@ namespace lib
 		this->onFixedUpdate(timestep);
 		b3World_Step(worldId, timestep, 4);
 		world.view<Transform3D, Rigidbody3D>().each(Rigidbody3D::FixedUpdate);
+
+		for (auto&& [id, transform, controller] : world.view<Transform3D, PlayerMoverController>().each())
+		{
+			Entity e(id, world);
+			controller.fixedUpdate(worldId, e, transform, timestep);
+		}
 	}
 	void Scene3D::render()
 	{
@@ -96,6 +109,12 @@ namespace lib
 		const SceneCamera3D& camera_in_use = getSceneCamera();
 		BeginMode3D(camera_in_use);
 			this->onRender3D(camera_in_use);
+
+			for (auto&& [id, transform, controller] : world.view<Transform3D, PlayerMoverController>().each())
+			{
+				Entity e(id, world);
+				controller.render();
+			}
 		EndMode3D();
 		this->onRenderUI();
 	}
@@ -111,7 +130,6 @@ namespace lib
 	}
 	const SceneCamera3D& Scene3D::getSceneCamera() const
 	{
-		// TODO: insert return statement here
 		for (auto&& [id, cam] : world.view<SceneCamera3D>(entt::exclude<components::DisabledTag>).each())
 		{
 			return cam;
