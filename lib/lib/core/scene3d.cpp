@@ -61,6 +61,9 @@ namespace lib
 	}
 	void Scene3D::update(float dt)
 	{
+		auto deleted = world.view<components::DeleteTag>();
+		world.destroy(deleted.begin(), deleted.end());
+
 		this->onUpdate(dt);
 	}
 	void Scene3D::fixedUpdate(float timestep)
@@ -88,7 +91,7 @@ namespace lib
 	}
 	void Scene3D::renderScene()
 	{
-		const SceneCamera3D& camera_in_use = default_camera;
+		const SceneCamera3D& camera_in_use = getSceneCamera();
 		BeginMode3D(camera_in_use);
 			this->onRender3D(camera_in_use);
 		EndMode3D();
@@ -202,7 +205,7 @@ namespace lib
 			if (auto* transform = selected.tryGet<Transform3D>())
 			{
 				Matrix selected_matrix = transform->toMatrix();
-				if (EditorDrawTransformWidget(viewportPos, viewportSize, default_camera, selected_matrix))
+				if (EditorDrawTransformWidget(viewportPos, viewportSize, getSceneCamera(), selected_matrix))
 				{
 					*transform = selected_matrix;
 					if (auto* rb = selected.tryGet<Rigidbody3D>())

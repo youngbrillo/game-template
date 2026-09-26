@@ -81,6 +81,8 @@ namespace lib
 		void write(YAML::Emitter& out);
 		void read(const YAML::Node& node);
 		void inspect();
+
+		static void Inspect(Entity& e, BoxCollider3D& component);
 	};
 	struct SphereCollider3D : public iCollider3D
 	{
@@ -105,6 +107,7 @@ namespace lib
 		void write(YAML::Emitter& out);
 		void read(const YAML::Node& node);
 		void inspect();
+		static void Inspect(Entity& e, SphereCollider3D& component);
 	};
 
 }

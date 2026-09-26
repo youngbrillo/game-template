@@ -10,6 +10,9 @@ namespace lib
 {
 	static SerializeEntityCallback writeEntityCallback = nullptr;
 	static DeserializeEntityCallback readEntityCallback = nullptr;
+	static EntityComponentPopupCallback onAddCallback = nullptr;
+	static EntityComponentWidgetCallback widgetCallback= nullptr;
+	static EntityActionPopupCallback actionCallback = nullptr;
 
 
 	void SetSerializeEntityCallback(SerializeEntityCallback callback)
@@ -19,6 +22,21 @@ namespace lib
 	void SetDeserializeEntityCallback(DeserializeEntityCallback callback)
 	{
 		readEntityCallback = callback;
+	}
+
+	void SetEntityComponentPopupCallback(EntityComponentPopupCallback callback)
+	{
+		onAddCallback = callback;
+	}
+
+	void SetEntityComponentWidgetCallback(EntityComponentWidgetCallback callback)
+	{
+		widgetCallback = callback;
+	}
+
+	void SetEntityActionPopupCallback(EntityActionPopupCallback callback)
+	{
+		actionCallback = callback;
 	}
 
 	void Entity::destroy()
@@ -283,9 +301,78 @@ namespace lib
 	}
 	void Entity::inspect()
 	{
-		auto& name_tag = get<components::NameTag>();
-		ImGui::InputText("name", &name_tag.name);
+		auto& info = get<components::NameTag>();
+		bool visible = isVisible();
+		bool _enabled = isEnabled();
+		bool serializable = isSerializable();
 
+
+		ImGui::AlignTextToFramePadding();
+		ImGui::PushItemWidth(-150);
+		ImGui::InputText("Name", &info.name);
+		ImGui::SameLine();
+		ImGui::PushItemWidth(-1);
+		if (ImGui::Button("Add Component"))
+			ImGui::OpenPopup("AddComponent");
+
+		if (ImGui::Checkbox("visible", &visible))
+		{
+			if (visible)
+				this->show();
+			else
+				this->hide();
+		}
+		ImGui::SameLine();
+		if (ImGui::Checkbox("enabled", &_enabled))
+		{
+			if (_enabled)
+				this->enable();
+			else
+				this->disable();
+		}
+
+		ImGui::SameLine();
+		if (ImGui::Checkbox("serializable", &serializable))
+		{
+			if (serializable)
+				this->enableSerialization();
+			else
+				this->disableSerialization();
+		}
+		if (ImGui::BeginPopup("AddComponent"))
+		{
+			if (ImGui::BeginMenu("3D"))
+			{
+				RenderComponentPopupMenuItem<Transform3D>("Transform 3D", *this);
+				RenderComponentPopupMenuItem<StaticMesh>("Static Mesh", *this);
+				RenderComponentPopupMenuItem<SceneCamera3D>("Scene Camera 3D", *this);
+				//RenderComponentPopupMenuItem<SceneCamera3DThirdPersonController>("Scene Camera 3D Thirdperson Controller", *this);
+
+				if (ImGui::BeginMenu("Physics"))
+				{
+					RenderComponentPopupMenuItem<Rigidbody3D>("Rigidbody 3D", *this);
+					RenderComponentPopupMenuItem<BoxCollider3D>("Box Collider 3D", *this);
+					RenderComponentPopupMenuItem<SphereCollider3D>("Sphere Collider 3D", *this);
+
+					ImGui::EndMenu();
+				}
+
+				ImGui::EndMenu();
+			}
+
+			if (onAddCallback) onAddCallback(*this);
+
+			ImGui::EndPopup();
+		}
+
+		RenderComponentEditWidget<Transform3D>("Transform 3D", *this, Transform3D::Inspect);
+		RenderComponentEditWidget<StaticMesh>("Mesh Component", *this, StaticMesh::Inspect);
+		RenderComponentEditWidget<Rigidbody3D>("Rigidbody 3D", *this, Rigidbody3D::Inspect);
+		RenderComponentEditWidget<BoxCollider3D>("Box Collider 3D", *this, BoxCollider3D::Inspect);
+		RenderComponentEditWidget<SphereCollider3D>("Sphere Collider 3D", *this, SphereCollider3D::Inspect);
+		RenderComponentEditWidget<SceneCamera3D>("Scene Camera 3D", *this, EntityQuickInspctor<SceneCamera3D>);
+
+		if (widgetCallback) widgetCallback(*this);
 	}
 	Entity Entity::createChild(std::string name)
 	{
@@ -494,5 +581,61 @@ namespace lib
 		}
 
 		return wasDropped;
+	}
+	void Entity::HierarchyPopupActions(entt::registry& world, Entity& selected_entity)
+	{
+		if (ImGui::MenuItem("3D Node")) {
+			Entity e = Entity::Create(world, "Node");
+			auto& t = e.add<Transform3D>();
+			selected_entity = e;
+		}
+
+		if (ImGui::MenuItem("Scene Camera")) {
+			Entity e = Entity::Create(world, "Scene Camera");
+			auto& camera = e.add<SceneCamera3D>();
+			selected_entity = e;
+		}
+
+		if (ImGui::BeginMenu("Cubes"))
+		{
+			if (ImGui::MenuItem("Cube")) {
+				Entity e = Entity::Create(world, "cube");
+				auto& t = e.add<Transform3D>();
+				auto& mesh = e.add<StaticMesh>();
+				selected_entity = e;
+			}
+
+			if (ImGui::MenuItem("Static Cube")) {
+				Entity e = Entity::Create(world, "cube (static)");
+				auto& t = e.add<Transform3D>();
+				auto& mesh = e.add<StaticMesh>();
+				auto& rb = e.add<Rigidbody3D>();
+				rb.type = b3BodyType::b3_staticBody;
+				auto& box = e.add<BoxCollider3D>();
+				selected_entity = e;
+			}
+
+			if (ImGui::MenuItem("Kinematic Cube")) {
+				Entity e = Entity::Create(world, "cube (kinematic)");
+				auto& t = e.add<Transform3D>();
+				auto& mesh = e.add<StaticMesh>();
+				auto& rb = e.add<Rigidbody3D>();
+				rb.type = b3BodyType::b3_kinematicBody;
+				auto& box = e.add<BoxCollider3D>();
+				selected_entity = e;
+			}
+			if (ImGui::MenuItem("Dynamic Cube")) {
+				Entity e = Entity::Create(world, "cube (dynamic)");
+				auto& t = e.add<Transform3D>();
+				auto& mesh = e.add<StaticMesh>();
+				auto& rb = e.add<Rigidbody3D>();
+				rb.type = b3BodyType::b3_dynamicBody;
+				auto& box = e.add<BoxCollider3D>();
+				selected_entity = e;
+			}
+
+			ImGui::EndMenu();
+		}
+		if (actionCallback) actionCallback(world, selected_entity);
 	}
 }

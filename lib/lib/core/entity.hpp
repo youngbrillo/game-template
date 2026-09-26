@@ -14,9 +14,15 @@ namespace lib
 
     typedef void(*SerializeEntityCallback)(YAML::Emitter& out, Entity& e);
     typedef void(*DeserializeEntityCallback)(const YAML::Node& root, Entity& e);
+    typedef void(*EntityComponentPopupCallback)(Entity& e);
+    typedef void(*EntityComponentWidgetCallback)(Entity& e);
+    typedef void(*EntityActionPopupCallback)(entt::registry& world, Entity& selected_entity);
 
     void SetSerializeEntityCallback(SerializeEntityCallback callback);
     void SetDeserializeEntityCallback(DeserializeEntityCallback callback);
+    void SetEntityComponentPopupCallback(EntityComponentPopupCallback callback);
+    void SetEntityComponentWidgetCallback(EntityComponentWidgetCallback callback);
+    void SetEntityActionPopupCallback(EntityActionPopupCallback callback);
 
     namespace components
     {
@@ -187,6 +193,7 @@ namespace lib
         static Entity Create(entt::registry& world, std::string name);
         static void DragSource(const char* label, Entity e);
         static bool DropTarget(Entity& e, entt::registry& world);
+        static void HierarchyPopupActions(entt::registry& world, Entity& selected_entity);
     };
 
 

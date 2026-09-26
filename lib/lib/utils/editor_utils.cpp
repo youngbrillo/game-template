@@ -75,6 +75,25 @@ namespace lib
                 continue;
             EditorInspectEntityInHierarchy(e, selected_entity);
         }
+
+
+		//draw menu when not over entity
+		if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_::ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
+		{
+			if (ImGui::BeginMenu("Actions"))
+			{
+				if (ImGui::BeginMenu("Create Entities"))
+				{
+					if (ImGui::MenuItem("Empty"))
+						selected_entity = Entity::Create(world, "blank entity");
+
+					Entity::HierarchyPopupActions(world, selected_entity);
+					ImGui::EndMenu();
+				}
+				ImGui::EndMenu();
+			}
+			ImGui::EndPopup();
+		}
     }
 
     void EditorInspectEntityInHierarchy(Entity e, Entity& selected_entity)

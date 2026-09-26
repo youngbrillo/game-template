@@ -2,6 +2,7 @@
 #include "collider3d_types.hpp"
 #include "lib/utils/yaml_common.hpp"
 #include "lib/scripting/bindings/entity_extensions.hpp"
+#include <imgui.h>
 
 namespace lib
 {
@@ -67,13 +68,25 @@ namespace lib
 	}
 	void BoxCollider3D::inspect()
 	{
-
+		ImGui::Checkbox("auto size", &autoSize);
+		ImGui::DragFloat3("size", &size.x, 0.1f);
 		this->onInspect();
+	}
+	void BoxCollider3D::Inspect(Entity& e, BoxCollider3D& component)
+	{
+		component.inspect();
 	}
 	void SphereCollider3D::inspect()
 	{
+		ImGui::DragFloat("radius", &radius, 0.1f);
+		ImGui::DragFloat3("origin", &origin.x, 0.1f);
 
 		this->onInspect();
+	}
+
+	void SphereCollider3D::Inspect(Entity& e, SphereCollider3D& component)
+	{
+		component.inspect();
 	}
 
 	void iCollider3D::Bind(sol::state& lua)

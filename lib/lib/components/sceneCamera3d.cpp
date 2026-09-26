@@ -1,6 +1,7 @@
 #include "sceneCamera3d.hpp"
 #include "lib/utils/yaml_common.hpp"
 #include "lib/scripting/bindings/entity_extensions.hpp"
+#include <imgui.h>
 
 namespace lib
 {
@@ -16,6 +17,14 @@ namespace lib
 	}
 	void SceneCamera3D::inspect()
 	{
+		ImGui::DragFloat3("position", &camera.position.x);
+		ImGui::DragFloat3("target", &camera.target.x);
+		ImGui::DragFloat3("up", &camera.up.x);
+		ImGui::DragFloat("fovy", &camera.fovy, 0.1f, 0.01f, 180.0f);
+
+		ImGui::CheckboxFlags("Perspective", &camera.projection, CAMERA_PERSPECTIVE);
+		ImGui::SameLine();
+		ImGui::CheckboxFlags("Orthographic", &camera.projection, CAMERA_ORTHOGRAPHIC);
 	}
 	void SceneCamera3D::Bind(sol::state& lua)
 	{
