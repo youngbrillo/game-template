@@ -1,8 +1,15 @@
 settings: {name: Template - Scene 2, config: resources/scene2.yaml, script: ""}
 world:
   - entity: {name: Editor Camera, id: 0X08C7C3F6F3361B13}
-    SceneCamera3D: {camera: {position: [8.170948, 34.199127, -16.559025], target: [-20.131186, -2.7048416, 24.926971], up: [0, 1, 0], fovy: 45, projection: 0}}
-    CameraController3D: {enabled: true, mode: 1}
+    SceneCamera3D: {camera: {position: [-43.405922, 43.071423, 7.442623], target: [0, 6, 0], up: [0, 1, 0], fovy: 45, projection: 0}}
+    CameraController3D: {enabled: true, mode: 4}
+    Light3DManager: {id: 0X0000000000000000, ownsShader: false, ambient: [0.78431374, 0.78431374, 0.78431374, 1]}
+    Light3D: {index: 0, type: 0, enabled: true, color: FFFFFFFF}
+  - entity: {name: ground, id: 0X7B79BA9EC4FF70A9}
+    Transform3D: {p: [-12.220934, -1.9468377, -1.9762592], s: [55.907455, 0.28231278, 55.142258], o: [0, 0, 0, 1]}
+    StaticMesh: {id: 0X0000000000000000, tint: 48AB69FF}
+    Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
+    BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}
   - entity: {name: Level Geometry, id: 0X19D351E1B8565B9F}
     children:
       - entity: {name: platform 1, id: 0XE4F13DEFAA574EB4}
@@ -60,11 +67,6 @@ world:
         StaticMesh: {id: 0X0000000000000000, tint: 928181FF}
         Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
         BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}
-  - entity: {name: ground, id: 0X7B79BA9EC4FF70A9}
-    Transform3D: {p: [-12.220934, 0, -1.9762592], s: [55.907455, 0.28231278, 55.142258], o: [0, 0, 0, 1]}
-    StaticMesh: {id: 0X0000000000000000, tint: 212F27FF}
-    Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
-    BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}
   - entity: {name: rails, id: 0XDDCBDC707E1BFEBC}
     children:
       - entity: {name: guard-rail, id: 0X9D7AE4F2AE52718F}

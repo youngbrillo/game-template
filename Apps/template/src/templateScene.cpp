@@ -5,6 +5,7 @@
 #include "lib/utils/random_funcs.hpp"
 #include "lib/scripting/luaScript.hpp"
 
+#define MODEL_MAX 2
 namespace lib
 {
 	void SerializeAppComponents(YAML::Emitter& out, Entity& e)
@@ -19,13 +20,17 @@ namespace lib
 
 	class TemplateScene : public Scene3D
 	{
-		Model models[2];
+		Model models[MODEL_MAX];
+		Shader shaders[1];
+
 	public:
 		TemplateScene(SceneSettings p_settings)
 			:Scene3D(p_settings)
 		{
 			models[0] = LoadModelFromMesh(GenMeshCube(1, 1, 1));
 			models[1] = LoadModelFromMesh(GenMeshSphere(0.5f, 16, 16));
+			shaders[0] = LoadBasicLightingShader();
+
 			default_camera.camera.position = Vector3{ 50,15,35 };
 
 			SetSerializeEntityCallback(SerializeAppComponents);
@@ -33,9 +38,36 @@ namespace lib
 		}
 		~TemplateScene()
 		{
-			UnloadModel(models[0]);
-			UnloadModel(models[1]);
+			for (size_t i = 0; i < MODEL_MAX; i++)
+			{
+				UnloadModel(models[i]);
+			}
+			UnloadShader(shaders[0]);
 		}
+
+		virtual void onInit() override
+		{
+			for (size_t i = 0; i < MODEL_MAX; i++)
+			{
+				for (size_t mi = 0; mi < models[i].materialCount; mi++)
+					models[i].materials[mi].shader = shaders[0];
+			}
+
+			for (auto [id, lm] : world.view<Light3DManager>().each())
+			{
+				lm.init(shaders[0]);
+			}
+			for (auto [id, tf, light] : world.view<Transform3D, Light3D>().each())
+			{
+				light.init(shaders[0], tf.position, tf.position + tf.Front());
+			}
+
+			for (auto [id, cam, light] : world.view<SceneCamera3D, Light3D>().each())
+			{
+				light.init(shaders[0], cam.camera.position, cam.camera.target);
+			}
+		}
+
 
 		virtual void onScriptInitalized() override {
 			mainScript.state["CreateEntity"] = [=](const std::string& name) { return Entity::Create(world, name); };
@@ -48,12 +80,18 @@ namespace lib
 		virtual void onUpdate(float dt) override{
 			if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
 				UpdateCamera(&default_camera.camera, CAMERA_THIRD_PERSON);
+
+			world.view<Transform3D, Light3D>().each(Light3D::SetLightFromTransform);
+			world.view<SceneCamera3D, Light3D>().each(Light3D::SetLightFromCamera);
 		}
 		virtual void onFixedUpdate(float timestep) override{
 
 
 		}
 		virtual void onRender3D(const SceneCamera3D& camera) override{
+			for (auto&& [id, lm] : world.view<Light3DManager>().each())
+				lm.update(camera.camera.position);
+
 			auto view = world.view<const Transform3D, const StaticMesh>().each();
 			for (auto&& [id, t, m] : view) {
 				models[m.id].transform = t.toMatrix();
