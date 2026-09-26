@@ -2,6 +2,8 @@
 #include "lib/utils/yaml_common.hpp"
 #include "sol/sol.hpp"
 #include "lib/scripting/bindings/entity_extensions.hpp"
+#include "rigidbody3d.hpp"
+#include <imgui.h>
 
 namespace lib
 {
@@ -164,7 +166,11 @@ namespace lib
 
 	bool Transform3D::inspect()
 	{
-		return false;
+		bool moved = ImGui::DragFloat3("position", &position.x, 0.1f);
+		bool resized = ImGui::DragFloat3("size", &size.x, 0.1f);
+		bool rotated = ImGui::DragFloat4("orientation", &orientation.x, 0.1f);
+
+		return moved || resized || rotated;
 	}
 
 	void Transform3D::ScriptBind(sol::state& lua)
@@ -194,7 +200,9 @@ namespace lib
 	{
 		if (component.inspect())
 		{
-			//check for rigidbody and teleport if true
+			if (auto* rb = e.tryGet<Rigidbody3D>()) {
+				rb->setTransform(component);
+			}
 		}
 	}
 }

@@ -1,6 +1,7 @@
 #include "mesh_types.hpp"
 #include "lib/utils/yaml_common.hpp"
 #include "lib/scripting/bindings/entity_extensions.hpp"
+#include "imgui.h"
 
 namespace lib
 {
@@ -20,6 +21,11 @@ namespace lib
 
 	void StaticMesh::inspect()
 	{
+		Vector4 color = ColorNormalize(tint);
+		if (ImGui::ColorEdit4("color", &color.x, ImGuiColorEditFlags_::ImGuiColorEditFlags_DisplayHex))
+		{
+			tint = ColorFromNormalized(color);
+		}
 	}
 
 	void StaticMesh::Bind(sol::state& lua)
