@@ -45,10 +45,12 @@ project(basename)
     IncludeVendor("imgui")
     IncludeVendor("box3D")
     IncludeVendor("lua")
+    IncludeVendor("ImGuizmo")
 
     LinkVendor("raylib")
     LinkVendor("yaml-cpp")
     LinkVendor("imgui")
     LinkVendor("box3D")
     LinkVendor("lua")
+    LinkVendor("ImGuizmo")
 

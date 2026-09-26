@@ -1,7 +1,7 @@
 #include "editor_utils.hpp"
 #include "rlImgui/rlImGui.h"
 #include "imgui_stdlib.h"
-#include "ImGuizmo/ImGuizmo.h"
+#include "ImGuizmo.h"
 #include <raymath.h>
 #include "lib/utils/yaml_common.hpp"
 

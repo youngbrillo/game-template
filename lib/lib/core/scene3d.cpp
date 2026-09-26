@@ -2,7 +2,7 @@
 #include "lib/components/components3d.hpp"
 #include "lib/utils/editor_utils.hpp"
 #include <imgui_stdlib.h>
-#include "lib/utils/ImGuizmo/ImGuizmo.h"
+#include "ImGuizmo.h"
 
 namespace lib
 {
