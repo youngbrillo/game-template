@@ -8,7 +8,7 @@ local scene = {
 
 function scene:onInit()
     print "\t Initializing Scene 1"
-    self:create_random_boxes();
+    -- self:create_random_boxes();
     self:create_random_spheres();
 end
 

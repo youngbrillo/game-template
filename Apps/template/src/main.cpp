@@ -7,11 +7,21 @@
 #include "lib/utils/yaml_common.hpp"
 #include "lib/utils/editor_utils.hpp"
 #include "scenes_registration.h"
+#include <vector>
 
 struct AppConfig
 {
+	struct SceneEntry
+	{
+		std::string name, path;
+	};
+
 	std::string name = "Template";
 	lib::UUID id;
+	struct {
+		int current = 0;
+		std::vector<SceneEntry> entries;
+	} scenes;
 
 	struct 
 	{
@@ -19,7 +29,9 @@ struct AppConfig
 		int height = 720;
 		int flags = FLAG_WINDOW_RESIZABLE | FLAG_MSAA_4X_HINT;
 		int monitor = 0;
+		int fps = 120;
 	} window;
+
 	static AppConfig LoadFromFile(const char* filepath)
 	{
 		AppConfig a;
@@ -37,12 +49,27 @@ struct AppConfig
 					lib::readYamlValue(win_node["height"], &a.window.height);
 					lib::readYamlValue(win_node["flags"], &a.window.flags);
 					lib::readYamlValue(win_node["monitor"], &a.window.monitor);
+					lib::readYamlValue(win_node["fps"], &a.window.fps);
+				}
+
+				if (auto scenes_node = node["scenes"])
+				{
+					lib::readYamlValue(scenes_node["current"], &a.scenes.current);
+
+					for (auto n : scenes_node["entries"])
+					{
+						if (auto s = n["scene"])
+						{
+							auto& entry = a.scenes.entries.emplace_back();
+							lib::readYamlValue(s["name"], &entry.name);
+							lib::readYamlValue(s["path"], &entry.path);
+						}
+					}
 				}
 			}
 		}
 		return a;
 	}
-
 	void save(const char* filepath)
 	{
 		window.width = GetScreenWidth();
@@ -61,48 +88,69 @@ struct AppConfig
 					<< YAML::Key << "width" << YAML::Value << window.width
 					<< YAML::Key << "height" << YAML::Value << window.height
 					<< YAML::Key << "flags" << YAML::Value << window.flags
-					//<< YAML::Key << "lockFPS" << YAML::Value << window.lockFPS
-					//<< YAML::Key << "FPS" << YAML::Value << window.FPS
+					<< YAML::Key << "fps" << YAML::Value << window.fps
 					<< YAML::Key << "monitor" << YAML::Value << window.monitor
 				<< YAML::EndMap
-				//<< YAML::Key << "memory" << YAML::Value
-				//<< YAML::BeginMap
-				//	<< YAML::Key << "rememberLastMonitor" << YAML::Value << memory.lastMonitor
-				//	<< YAML::Key << "rememberScreenSize" << YAML::Value << memory.screenSize
-				//<< YAML::EndMap
-				//<< YAML::Key << "config" << YAML::Value
-				//<< YAML::BeginMap
-				//	<< YAML::Key << "logLevel" << YAML::Value << config.logLevel
-				//	<< YAML::Key << "escapeKey" << YAML::Value << config.escapeKey
-				//	<< YAML::Key << "clearColor" << YAML::Value << TextFormat("0x%08" PRIx32, config.clearColor)
-				//<< YAML::EndMap
+				<< YAML::Key << "scenes" << YAML::Value
+				<< YAML::BeginMap
+					<< YAML::Key << "current" << YAML::Value << scenes.current
+					<< YAML::Key << "entries" << YAML::Value
+					<< YAML::BeginSeq;
+					for (auto& i : scenes.entries)
+					{
+						out << YAML::BeginMap
+							<< YAML::Key << "scene" << YAML::Value
+							<< YAML::Flow << YAML::BeginMap
+								<< YAML::Key << "name" << YAML::Value << i.name
+								<< YAML::Key << "path" << YAML::Value << i.path
+							<< YAML::EndMap
+						<< YAML::EndMap
+						;
+					}
+
+		out			<< YAML::EndSeq
+			<< YAML::EndMap
+
 			<< YAML::EndMap
 			;
 
 		lib::SaveYamlFile(filepath, out);
 	}
+	
+	void init()
+	{
+		SetConfigFlags(window.flags);
+		InitWindow(window.width, window.height, name.c_str());
+		if (window.monitor < GetMonitorCount())
+		{
+			SetWindowMonitor(window.monitor);
+			SetWindowSize(window.width, window.height);
+		}
+		SetTargetFPS(window.fps);
+		lib::EditorBegin();
+
+	}
+
+	void shutdown()
+	{
+		lib::EditorEnd();
+		CloseWindow();
+	}
+
+	const SceneEntry& GetCurrentEntry() const {
+		return scenes.entries[scenes.current];
+	}
 };
-
-
 
 int main(int argc, char** argv)
 {
 	AppConfig config = AppConfig::LoadFromFile("app.config.yaml");
-	SetConfigFlags(config.window.flags);
-	InitWindow(config.window.width, config.window.height, config.name.c_str());
-	if (config.window.monitor < GetMonitorCount())
-	{
-		SetWindowMonitor(config.window.monitor);
-		SetWindowSize(config.window.width, config.window.height);
-	}
-	SetTargetFPS(60);
-
+	config.init();
 	bool show_imgui_demo = true;
-	lib::EditorBegin();
 
 	lib::SceneSettings settings = {
-		.name = "Template",
-		.configPath = "resources/scene1.yaml"
+		.name = config.GetCurrentEntry().name,
+		.configPath = config.GetCurrentEntry().path,
 	};
 
 
@@ -137,11 +185,8 @@ int main(int argc, char** argv)
 			scene->fixedUpdate(pTimeLimit);
 		}
 
-
-
 		BeginDrawing();
 		ClearBackground(BLACK);
-
 		scene->render();
 
 		lib::EditorBeginDraw();
@@ -156,7 +201,6 @@ int main(int argc, char** argv)
 	scene = nullptr;
 
 	config.save("app.config.yaml");
-	lib::EditorEnd();
-	CloseWindow();
+	config.shutdown();
 	return 0;
 }

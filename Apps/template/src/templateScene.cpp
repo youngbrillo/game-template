@@ -1,10 +1,9 @@
 #include "scenes_registration.h"
-#include "lib/components/transform3d.hpp"
-#include "lib/components/sceneCamera3d.hpp"
+#include "lib/core/scene3d.hpp"
+#include "lib/components/components3d.hpp"
 #include "lib/utils/yaml_common.hpp"
 #include "lib/utils/random_funcs.hpp"
 #include "lib/scripting/luaScript.hpp"
-#include "lib/components/components3d.hpp"
 
 namespace lib
 {
@@ -18,20 +17,16 @@ namespace lib
 
 	}
 
-	class TemplateScene : public iScene
+	class TemplateScene : public Scene3D
 	{
 		Model models[2];
-		lib::SceneCamera3D camera;
-		b3WorldId worldid;
-		LuaScript mainScript;
-
 	public:
 		TemplateScene(SceneSettings p_settings)
-			:iScene(p_settings)
+			:Scene3D(p_settings)
 		{
 			models[0] = LoadModelFromMesh(GenMeshCube(1, 1, 1));
 			models[1] = LoadModelFromMesh(GenMeshSphere(0.5f, 16, 16));
-			camera.camera.position = Vector3{ 50,15,35 };
+			default_camera.camera.position = Vector3{ 50,15,35 };
 
 			SetSerializeEntityCallback(SerializeAppComponents);
 			SetDeserializeEntityCallback(DeserializeAppComponents);
@@ -42,67 +37,30 @@ namespace lib
 			UnloadModel(models[1]);
 		}
 
-		virtual void init(){
-			b3WorldDef wdef = b3DefaultWorldDef();
-
-			worldid = b3CreateWorld(&wdef);
-
-			this->LoadFromFile(settings.configPath);
-
-			for (auto&& [id, t, rb] : world.view<Transform3D, Rigidbody3D>().each())
-			{
-				rb.init(worldid, t, (uint32_t)id);
-			}
-
-			for (auto&& [id, t, rb, bc] : world.view<Transform3D, Rigidbody3D, BoxCollider3D>().each())
-			{
-				bc.init(rb.id, t.size, (uint32_t)id);
-			}
-
-			for (auto&& [id, t, rb, bc] : world.view<Transform3D, Rigidbody3D, SphereCollider3D>().each())
-			{
-				bc.init(rb.id, t.size, (uint32_t)id);
-			}
-
-			if (mainScript.LoadFile(settings.scriptPath))
-			{
-				mainScript.state["CreateBox"] = [=](Transform3D t, Color c) {CreateBox(t, c); };
-				mainScript.state["CreateSphere"] = [=](Vector3 v, Color c) {CreateSphere(v, c); };
-
-				mainScript.ExecuteScriptFunction("onInit");
-			}
+		virtual void onScriptInitalized() override {
+			mainScript.state["CreateBox"] = [=](Transform3D t, Color c) {CreateBox(t, c); };
+			mainScript.state["CreateSphere"] = [=](Vector3 v, Color c) {CreateSphere(v, c); };
 		}
-		virtual void free(){
+		virtual void onFree() override {
 
-			if (mainScript.isEnabled())
-			{
-				mainScript.ExecuteScriptFunction("onFree");
-			}
-			b3DestroyWorld(worldid);
-			world.clear();
-			mainScript.free();
 		}
-		virtual void update(float dt){
+		virtual void onUpdate(float dt) override{
 			if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
-				UpdateCamera(&camera.camera, CAMERA_THIRD_PERSON);
+				UpdateCamera(&default_camera.camera, CAMERA_THIRD_PERSON);
 		}
-		virtual void fixedUpdate(float timestep){
+		virtual void onFixedUpdate(float timestep) override{
 
-			b3World_Step(worldid, timestep, 4);
-			world.view<Transform3D, Rigidbody3D>().each(Rigidbody3D::FixedUpdate);
 
 		}
-		virtual void render(){
-			BeginMode3D(camera);
-
+		virtual void onRender3D(const SceneCamera3D& camera) override{
 			auto view = world.view<const Transform3D, const StaticMesh>().each();
 			for (auto&& [id, t, m] : view) {
 				models[m.id].transform = t.toMatrix();
 				DrawModel(models[m.id], Vector3Zeros, 1.0f, m.tint);
 			}
-			
-			EndMode3D();
 
+		}
+		virtual void onRenderUI() override {
 			DrawText(TextFormat("Scene: %s", settings.name.c_str()), 10, 10, 20, WHITE);
 		}
 
@@ -117,7 +75,7 @@ namespace lib
 
 			auto& rb = e.add<Rigidbody3D>();
 				rb.type = b3_dynamicBody;
-				rb.init(worldid, t, e);
+				rb.init(worldId, t, e);
 			auto& bc = e.add<BoxCollider3D>();
 				bc.init(rb.id, t.size, e);
 			return e;
@@ -134,7 +92,7 @@ namespace lib
 
 			auto& rb = e.add<Rigidbody3D>();
 				rb.type = b3_dynamicBody;
-				rb.init(worldid, t, e);
+				rb.init(worldId, t, e);
 
 			auto& bc = e.add<SphereCollider3D>();
 				bc.init(rb.id, t.size, e);

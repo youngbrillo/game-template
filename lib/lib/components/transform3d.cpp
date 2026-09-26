@@ -192,6 +192,10 @@ namespace lib
 	}
 	void Transform3D::Inspect(Entity e, Transform3D& component)
 	{
+		if (component.inspect())
+		{
+			//check for rigidbody and teleport if true
+		}
 	}
 }
 

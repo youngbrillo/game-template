@@ -27,6 +27,7 @@ namespace lib
 		virtual void update(float dt) = 0;
 		virtual void fixedUpdate(float timestep) = 0;
 		virtual void render() = 0;
+		virtual void inspect() = 0;
 
 		void SaveToFile(const std::string& filepath);
 		void SaveToOutput(YAML::Emitter& out);
