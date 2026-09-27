@@ -10,6 +10,8 @@
 #include <vector>
 #include "lib/core/input_manager.hpp"
 
+#include "tinyfiledialogs.h"
+
 struct AppConfig
 {
 	struct SceneEntry
@@ -149,7 +151,28 @@ struct AppConfig
 		if (ImGui::BeginMenu("File"))
 		{
 			ImGui::MenuItem("New Scene", nullptr, nullptr, false);
-			ImGui::MenuItem("Open Scene", nullptr, nullptr, false);
+			if (ImGui::MenuItem("Open Scene", nullptr, nullptr))
+			{
+				char* nextFile;
+				char const* filterPatterns[2] = { "*.yaml", "*.yml" };
+				nextFile = tinyfd_openFileDialog("Lets get a scene file",
+					GetWorkingDirectory(), 2, filterPatterns, "scene files", 0
+				);
+				if (nextFile)
+				{
+					auto& new_entry = this->scenes.entries.emplace_back();
+					new_entry.name = GetFileNameWithoutExt(nextFile);
+					new_entry.path = nextFile;
+
+					int i = this->scenes.entries.size() - 1;
+
+					scenes.current = i;
+					scene->free();
+					scene->settings.name = this->GetCurrentEntry().name;
+					scene->settings.configPath = this->GetCurrentEntry().path;
+					scene->init();
+				}
+			}
 
 			if (ImGui::MenuItem("Save Scene", "CTRL+S", nullptr, scene != nullptr))
 			{

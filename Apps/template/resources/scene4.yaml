@@ -1,0 +1,14 @@
+settings: {name: Village, config: resources/scene4.yaml, script: ""}
+world:
+  - entity: {name: Editor Camera, id: 0X08C7C3F6F3361B13}
+    SceneCamera3D: {camera: {position: [-41.163815, 18.432074, 41.22055], target: [0, 6, 0], up: [0, 1, 0], fovy: 45, projection: 0}}
+    CameraController3D: {enabled: true, mode: 4}
+    Light3DManager: {id: 0X0000000000000000, ownsShader: false, ambient: [0.78431374, 0.78431374, 0.78431374, 1]}
+    Light3D: {index: 0, type: 0, enabled: true, color: FFFFFFFF}
+  - entity: {name: Env, id: 0X9FE2B309F3C65796}
+    children:
+      - entity: {name: ground, id: 0XFDFA73E50E1BA73D}
+        Transform3D: {p: [0, -0.5, 0], s: [50, 1, 50], o: [0, 0, 0, 1]}
+        StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
+        Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
+        BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}

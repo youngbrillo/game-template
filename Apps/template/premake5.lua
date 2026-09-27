@@ -46,6 +46,7 @@ project(basename)
     IncludeVendor("box3D")
     IncludeVendor("lua")
     IncludeVendor("ImGuizmo")
+    IncludeVendor("tinyfiledialogs")
 
     LinkVendor("raylib")
     LinkVendor("yaml-cpp")
@@ -53,4 +54,5 @@ project(basename)
     LinkVendor("box3D")
     LinkVendor("lua")
     LinkVendor("ImGuizmo")
+    LinkVendor("tinyfiledialogs")
 
