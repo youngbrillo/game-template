@@ -3,6 +3,10 @@
 #include <unordered_set>	//req. for make_unique_name
 #include <regex>			//req. for make_unique_name
 #include <lib/components/components3d.hpp>
+//TODO: make a 'lib/components/components2d.hpp'
+#include "lib/components/transform2d.hpp"
+#include "lib/components/sceneCamera2d.hpp"
+#include "lib/components/sprite.hpp"
 #include <lib/utils/editor_utils.hpp>
 #include <imgui_stdlib.h>
 
@@ -183,6 +187,23 @@ namespace lib
 		return false;
 	}
 
+	template<typename T>
+	static void EntityWriteComponentPro(YAML::Emitter& out, Entity e)
+	{
+		if (auto* c = e.tryGet<T>()) {
+			out << YAML::Key << T::TypeName() << YAML::Value;
+			c->serialize(out);
+		}
+	}
+
+	template<typename T>
+	static void EntityReadComponentPro(const YAML::Node& node, Entity e)
+	{
+		if (auto n = node[T::TypeName()]) {
+			auto& c = e.add<T>();
+			c.deserialize(n);
+		}
+	}
 	void Entity::Serialize(YAML::Emitter& out)
 	{
 
@@ -240,6 +261,10 @@ namespace lib
 			c->write(out);
 		}
 
+		EntityWriteComponentPro<Transform2D>(out, *this);
+		EntityWriteComponentPro<SceneCamera2D>(out, *this);
+		EntityWriteComponentPro<SceneCamera2DPan>(out, *this);
+		EntityWriteComponentPro<Sprite>(out, *this);
 
 		if (writeEntityCallback) writeEntityCallback(out, *this);
 
@@ -316,9 +341,14 @@ namespace lib
 				c.read(n);
 			}
 			if (auto n = node["PlayerMoverController"]) {
-				auto& c = add<PlayerMoverController>();
+				auto& c = add<PlayerMoverController>(); 
 				c.read(n);
 			}
+
+			EntityReadComponentPro<Transform2D>(node, *this);
+			EntityReadComponentPro<SceneCamera2D>(node, *this);
+			EntityReadComponentPro<SceneCamera2DPan>(node, *this);
+			EntityReadComponentPro<Sprite>(node, *this);
 
 			if (readEntityCallback) readEntityCallback(node, *this);
 
@@ -390,13 +420,20 @@ namespace lib
 					RenderComponentPopupMenuItem<Rigidbody3D>("Rigidbody 3D", *this);
 					RenderComponentPopupMenuItem<BoxCollider3D>("Box Collider 3D", *this);
 					RenderComponentPopupMenuItem<SphereCollider3D>("Sphere Collider 3D", *this);
-
+					RenderComponentPopupMenuItem<SphereCollider3D>("Sphere Collider 3D", *this);
 					ImGui::EndMenu();
 				}
 
 				ImGui::EndMenu();
 			}
-
+			if (ImGui::BeginMenu("2D"))
+			{
+				RenderComponentPopupMenuItemPro<Transform2D>(*this);
+				RenderComponentPopupMenuItemPro<SceneCamera2D>(*this);
+				RenderComponentPopupMenuItemPro<SceneCamera2DPan>(*this);
+				RenderComponentPopupMenuItemPro<Sprite>(*this);
+				ImGui::EndMenu();
+			}
 			if (onAddCallback) onAddCallback(*this);
 
 			ImGui::EndPopup();
@@ -412,6 +449,11 @@ namespace lib
 		RenderComponentEditWidget<Light3DManager>("Light3DManager", *this, EntityQuickInspctor<Light3DManager>);
 		RenderComponentEditWidget<Light3D>("Light3D", *this, EntityQuickInspctor<Light3D>);
 		RenderComponentEditWidget<PlayerMoverController>("Player Mover Controller", *this, PlayerMoverController::Inspect);
+
+		RenderComponentEditWidgetPro<Transform2D>(*this);
+		RenderComponentEditWidgetPro<SceneCamera2D>(*this);
+		RenderComponentEditWidgetPro<SceneCamera2DPan>(*this);
+		RenderComponentEditWidgetPro<Sprite>(*this);
 
 		if (widgetCallback) widgetCallback(*this);
 	}
@@ -625,65 +667,98 @@ namespace lib
 	}
 	void Entity::HierarchyPopupActions(entt::registry& world, Entity& selected_entity)
 	{
-		if (ImGui::MenuItem("3D Node")) {
-			Entity e = Entity::Create(world, "Node");
-			auto& t = e.add<Transform3D>();
-			selected_entity = e;
-		}
-
-		if (ImGui::MenuItem("Scene Camera")) {
-			Entity e = Entity::Create(world, "Scene Camera");
-			auto& camera = e.add<SceneCamera3D>();
-			selected_entity = e;
-		}
-
-		if (ImGui::MenuItem("Editor Camera")) {
-			Entity e = Entity::Create(world, "Editor Camera");
-			auto& camera = e.add<SceneCamera3D>();
-			auto& controller = e.add<CameraController3D>();
-			selected_entity = e;
-		}
-
-		if (ImGui::BeginMenu("Cubes"))
+		if (ImGui::BeginMenu("3D"))
 		{
-			if (ImGui::MenuItem("Cube")) {
-				Entity e = Entity::Create(world, "cube");
+			if (ImGui::MenuItem("3D Node")) {
+				Entity e = Entity::Create(world, "Node");
 				auto& t = e.add<Transform3D>();
-				auto& mesh = e.add<StaticMesh>();
 				selected_entity = e;
 			}
 
-			if (ImGui::MenuItem("Static Cube")) {
-				Entity e = Entity::Create(world, "cube (static)");
-				auto& t = e.add<Transform3D>();
-				auto& mesh = e.add<StaticMesh>();
-				auto& rb = e.add<Rigidbody3D>();
-				rb.type = b3BodyType::b3_staticBody;
-				auto& box = e.add<BoxCollider3D>();
+			if (ImGui::MenuItem("Scene Camera")) {
+				Entity e = Entity::Create(world, "Scene Camera");
+				auto& camera = e.add<SceneCamera3D>();
 				selected_entity = e;
 			}
 
-			if (ImGui::MenuItem("Kinematic Cube")) {
-				Entity e = Entity::Create(world, "cube (kinematic)");
-				auto& t = e.add<Transform3D>();
-				auto& mesh = e.add<StaticMesh>();
-				auto& rb = e.add<Rigidbody3D>();
-				rb.type = b3BodyType::b3_kinematicBody;
-				auto& box = e.add<BoxCollider3D>();
-				selected_entity = e;
-			}
-			if (ImGui::MenuItem("Dynamic Cube")) {
-				Entity e = Entity::Create(world, "cube (dynamic)");
-				auto& t = e.add<Transform3D>();
-				auto& mesh = e.add<StaticMesh>();
-				auto& rb = e.add<Rigidbody3D>();
-				rb.type = b3BodyType::b3_dynamicBody;
-				auto& box = e.add<BoxCollider3D>();
+			if (ImGui::MenuItem("Editor Camera")) {
+				Entity e = Entity::Create(world, "Editor Camera");
+				auto& camera = e.add<SceneCamera3D>();
+				auto& controller = e.add<CameraController3D>();
 				selected_entity = e;
 			}
 
+			if (ImGui::BeginMenu("Cubes"))
+			{
+				if (ImGui::MenuItem("Cube")) {
+					Entity e = Entity::Create(world, "cube");
+					auto& t = e.add<Transform3D>();
+					auto& mesh = e.add<StaticMesh>();
+					selected_entity = e;
+				}
+
+				if (ImGui::MenuItem("Static Cube")) {
+					Entity e = Entity::Create(world, "cube (static)");
+					auto& t = e.add<Transform3D>();
+					auto& mesh = e.add<StaticMesh>();
+					auto& rb = e.add<Rigidbody3D>();
+					rb.type = b3BodyType::b3_staticBody;
+					auto& box = e.add<BoxCollider3D>();
+					selected_entity = e;
+				}
+
+				if (ImGui::MenuItem("Kinematic Cube")) {
+					Entity e = Entity::Create(world, "cube (kinematic)");
+					auto& t = e.add<Transform3D>();
+					auto& mesh = e.add<StaticMesh>();
+					auto& rb = e.add<Rigidbody3D>();
+					rb.type = b3BodyType::b3_kinematicBody;
+					auto& box = e.add<BoxCollider3D>();
+					selected_entity = e;
+				}
+				if (ImGui::MenuItem("Dynamic Cube")) {
+					Entity e = Entity::Create(world, "cube (dynamic)");
+					auto& t = e.add<Transform3D>();
+					auto& mesh = e.add<StaticMesh>();
+					auto& rb = e.add<Rigidbody3D>();
+					rb.type = b3BodyType::b3_dynamicBody;
+					auto& box = e.add<BoxCollider3D>();
+					selected_entity = e;
+				}
+
+				ImGui::EndMenu();
+			}
 			ImGui::EndMenu();
 		}
+
+		if (ImGui::BeginMenu("2D"))
+		{
+			if (ImGui::MenuItem("2D Node")) {
+				Entity e = Entity::Create(world, "Node 2D");
+				auto& t = e.add<Transform2D>();
+				selected_entity = e;
+			}
+			if (ImGui::MenuItem("Scene Camera 2D")) {
+				Entity e = Entity::Create(world, "Scene Camera 2D");
+				auto& t = e.add<SceneCamera2D>();
+				selected_entity = e;
+			}
+			if (ImGui::MenuItem("Editor Camera 2D")) {
+				Entity e = Entity::Create(world, "Editor Camera 2D");
+				e.add<SceneCamera2D>();
+				e.add<SceneCamera2DPan>();
+				selected_entity = e;
+			}
+			if (ImGui::MenuItem("Sprite")) {
+				Entity e = Entity::Create(world, "Sprite");
+				auto& t = e.add<Transform2D>();
+				auto& s = e.add<Sprite>();
+				selected_entity = e;
+			}
+			ImGui::EndMenu();
+		}
+
+
 		if (actionCallback) actionCallback(world, selected_entity);
 	}
 }
