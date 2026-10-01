@@ -39,10 +39,19 @@ namespace lib
 			bc.init(rb.id, t.size, (uint32_t)id);
 		}
 
-		if (mainScript.LoadFile(settings.scriptPath))
+		if (!settings.scriptPath.empty() && mainScript.LoadFile(settings.scriptPath))
 		{
 			this->onScriptInitalized();
 			mainScript.ExecuteScriptFunction("onInit");
+		}
+		else
+		{
+			mainScript.init();
+		}
+
+		for (auto&& [id, script] : world.view<ScriptComponent>().each())
+		{
+			script.init(Entity(id, world), mainScript.state);
 		}
 
 
@@ -50,6 +59,13 @@ namespace lib
 	void Scene3D::free()
 	{
 		this->onFree();
+
+
+		for (auto&& [id, script] : world.view<ScriptComponent>().each())
+		{
+			script.free();
+		}
+
 		if (mainScript.isEnabled())
 		{
 			mainScript.ExecuteScriptFunction("onFree");
@@ -63,6 +79,12 @@ namespace lib
 	{
 		auto deleted = world.view<components::DeleteTag>();
 		world.destroy(deleted.begin(), deleted.end());
+
+
+		for (auto&& [id, script] : world.view<ScriptComponent>().each())
+		{
+			script.update(dt);
+		}
 
 		world.view<SceneCamera3D, CameraController3D>().each(CameraController3D::Update);
 

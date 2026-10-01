@@ -1,7 +1,7 @@
 settings: {name: Village, config: resources/scene4.yaml, script: ""}
 world:
   - entity: {name: Editor Camera, id: 0X08C7C3F6F3361B13}
-    SceneCamera3D: {camera: {position: [-41.163815, 18.432074, 41.22055], target: [0, 6, 0], up: [0, 1, 0], fovy: 45, projection: 0}}
+    SceneCamera3D: {camera: {position: [-41.439625, 16.13427, 41.571682], target: [0, 6, 0], up: [0, 1, 0], fovy: 45, projection: 0}}
     CameraController3D: {enabled: true, mode: 4}
     Light3DManager: {id: 0X0000000000000000, ownsShader: false, ambient: [0.78431374, 0.78431374, 0.78431374, 1]}
     Light3D: {index: 0, type: 0, enabled: true, color: FFFFFFFF}
@@ -12,3 +12,7 @@ world:
         StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
         Rigidbody3D: {type: 0, gravityScale: 1, motionLocks: 0}
         BoxCollider3D: {autoSize: true, base: {density: 1, friction: 0.6, restitution: 0, isSensor: false, contactFlags: 0}}
+  - entity: {name: Spinning cube, id: 0XC509EF300F9A89DF}
+    Transform3D: {p: [0, 10.560892, 0], s: [5, 5, 5], o: [0, 0, 0, 1]}
+    StaticMesh: {id: 0X0000000000000000, tint: E49D46FF}
+    ScriptComponent: {path: resources/object_rotator.lua}

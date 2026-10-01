@@ -6,3 +6,4 @@
 #include "light_types.hpp"
 #include "mesh_types.hpp"
 #include "playerMover.hpp"
+#include "scriptComponent.hpp"

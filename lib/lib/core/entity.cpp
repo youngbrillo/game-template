@@ -240,6 +240,10 @@ namespace lib
 			c->write(out);
 		}
 
+		if (auto* c = tryGet<ScriptComponent>()) {
+			out << YAML::Key << "ScriptComponent" << YAML::Value;
+			c->write(out);
+		}
 
 		if (writeEntityCallback) writeEntityCallback(out, *this);
 
@@ -319,6 +323,10 @@ namespace lib
 				auto& c = add<PlayerMoverController>();
 				c.read(n);
 			}
+			if (auto n = node["ScriptComponent"]) {
+				auto& c = add<ScriptComponent>();
+				c.read(n);
+			}
 
 			if (readEntityCallback) readEntityCallback(node, *this);
 
@@ -373,6 +381,7 @@ namespace lib
 		}
 		if (ImGui::BeginPopup("AddComponent"))
 		{
+			RenderComponentPopupMenuItem<ScriptComponent>("Script", *this);
 			if (ImGui::BeginMenu("3D"))
 			{
 				RenderComponentPopupMenuItem<Transform3D>("Transform 3D", *this);
@@ -402,6 +411,7 @@ namespace lib
 			ImGui::EndPopup();
 		}
 
+		RenderComponentEditWidget<ScriptComponent>("Script", *this, EntityQuickInspctor<ScriptComponent>);
 		RenderComponentEditWidget<Transform3D>("Transform 3D", *this, Transform3D::Inspect);
 		RenderComponentEditWidget<StaticMesh>("Mesh Component", *this, StaticMesh::Inspect);
 		RenderComponentEditWidget<Rigidbody3D>("Rigidbody 3D", *this, Rigidbody3D::Inspect);
