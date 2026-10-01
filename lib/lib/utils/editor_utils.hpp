@@ -33,6 +33,19 @@ namespace lib
 			}
 		}
 	}
+
+	template <typename T>
+	static void RenderComponentPopupMenuItemPro(Entity e)
+	{
+		if (e.has<T>() == false)
+		{
+			if (ImGui::MenuItem(T::DisplayName()))
+			{
+				e.add<T>();
+			}
+		}
+	}
+
 	template<typename T>
 	void EntityQuickInspctor(Entity& e, T& component)
 	{
@@ -88,5 +101,30 @@ namespace lib
 		{
 			entity.remove<T>();
 		}
+	}
+
+
+	template<typename T, typename ...Args>
+	inline void RenderComponentEditWidgetPro(Entity& entity, Args && ...args)
+	{
+		RenderComponentEditWidget<T>(T::DisplayName(), entity, EntityQuickInspctor<T>, std::forward<Args>(args)...);
+	}
+
+
+}
+
+namespace ImGui
+{
+	inline bool ColorEditRaylib(const char* label, Color& tint, ImGuiColorEditFlags flags = ImGuiColorEditFlags_DisplayHex)
+	{
+		bool v = false;
+		Vector4 color = ColorNormalize(tint);
+		if (ImGui::ColorEdit4(label, &color.x, flags))
+		{
+			tint = ColorFromNormalized(color);
+			v = true;
+		}
+
+		return v;
 	}
 }
