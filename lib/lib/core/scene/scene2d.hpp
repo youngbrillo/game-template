@@ -1,6 +1,6 @@
 #pragma once 
-#include "lib/core/iScene.hpp"
-#include "lib/components/sceneCamera2d.hpp"
+#include "iAppScene.hpp"
+#include "lib/components/2d/sceneCamera2d.hpp"
 #include "lib/scripting/luaScript.hpp"
 
 namespace lib

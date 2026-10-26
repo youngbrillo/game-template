@@ -1,5 +1,5 @@
 #include "scene2d.hpp"
-#include "lib/components/sprite.hpp"
+#include "lib/components/2d/sprite.hpp"
 #include "lib/utils/editor_utils.hpp"
 #include <imgui_stdlib.h>
 

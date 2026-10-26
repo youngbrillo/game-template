@@ -1,30 +1,18 @@
 #pragma once 
-#include "lib/core/scene/iScene.hpp"
+#include "iAppScene.hpp"
 #include "lib/components/3d/sceneCamera3d.hpp"
 #include "lib/scripting/luaScript.hpp"
 #include <box3d/box3d.h>
 
 namespace lib
 {
-	struct SceneInspector
-	{
-		struct {
-			bool settings = true;
-			bool entity = true;
-			bool viewport = true;
-			bool demo = false;
-		} window;
-		Entity selected;
-	};
 
-	class Scene3D : public iScene
+	class Scene3D : public iAppScene
 	{
 	public:
 		SceneCamera3D default_camera;
-		LuaScript mainScript;
 		b3WorldId worldId;
-		SceneViewport viewport;
-		SceneInspector m_scene_inspector;
+
 	public:
 		Scene3D(SceneSettings p_settings);
 		virtual ~Scene3D();
@@ -35,22 +23,10 @@ namespace lib
 		virtual void fixedUpdate(float timestep);
 		virtual void render();
 		virtual void renderScene();
-		virtual void inspect();
 
 		const SceneCamera3D& getSceneCamera() const;
 	protected:
-		virtual void onInit() {}
-		virtual void onScriptInitalized() {}
-		virtual void onFree() {}
-		virtual void onUpdate(float dt) {}
-		virtual void onFixedUpdate(float timestep) {}
-		virtual void onRender3D(const SceneCamera3D& camera) {}
-		virtual void onRenderUI() {}
-		virtual void onInspectWindow() {}
-		virtual void onInspectSettings() {}
-	protected:
-		void inspectSettings(Entity& selected);
-		void inspectEntity(Entity& selected);
-		void inspectViewport(Entity& selected);
+		virtual void onInspectViewportTop(Entity& selected) override;
+		virtual void onInspectViewportBottom(float* viewportPos, float* viewportSize, Entity& selected) override;
 	};
 }
