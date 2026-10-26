@@ -1,5 +1,5 @@
 #pragma once
-#include "lib/components/transform2d.hpp"
+#include "lib/components/2d/transform2d.hpp"
 
 namespace lib
 {

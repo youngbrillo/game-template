@@ -1,4 +1,4 @@
-#include "lib/components/rigidbody3d.hpp"
+#include "rigidbody3d.hpp"
 #include "lib/utils/yaml_common.hpp"
 #include "lib/scripting/bindings/entity_extensions.hpp"
 

@@ -1,7 +1,7 @@
 #pragma once
-#include "lib/components/transform3d.hpp"
-#include "lib/components/rigidbody3d.hpp"
-#include "lib/components/sceneCamera3d.hpp"
+#include "lib/components/3d/transform3d.hpp"
+#include "lib/components/3d/rigidbody3d.hpp"
+#include "lib/components/3d/sceneCamera3d.hpp"
 
 namespace lib
 {

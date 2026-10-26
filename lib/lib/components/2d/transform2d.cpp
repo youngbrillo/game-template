@@ -1,4 +1,4 @@
-#include "lib/components/transform2d.hpp"
+#include "transform2d.hpp"
 #include "lib/scripting/bindings/entity_extensions.hpp"
 #include <imgui.h>
 

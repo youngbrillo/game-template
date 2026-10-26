@@ -2,11 +2,11 @@
 #include "lib/utils/yaml_common.hpp"
 #include <unordered_set>	//req. for make_unique_name
 #include <regex>			//req. for make_unique_name
-#include <lib/components/components3d.hpp>
+#include <lib/components/3d/components3d.hpp>
 //TODO: make a 'lib/components/components2d.hpp'
-#include "lib/components/transform2d.hpp"
-#include "lib/components/sceneCamera2d.hpp"
-#include "lib/components/sprite.hpp"
+#include "lib/components/2d/transform2d.hpp"
+#include "lib/components/2d/sceneCamera2d.hpp"
+#include "lib/components/2d/sprite.hpp"
 #include <lib/utils/editor_utils.hpp>
 #include <imgui_stdlib.h>
 

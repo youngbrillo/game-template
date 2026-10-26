@@ -1,6 +1,6 @@
 #pragma once 
-#include "lib/core/iScene.hpp"
-#include "lib/components/sceneCamera3d.hpp"
+#include "lib/core/scene/iScene.hpp"
+#include "lib/components/3d/sceneCamera3d.hpp"
 #include "lib/scripting/luaScript.hpp"
 #include <box3d/box3d.h>
 

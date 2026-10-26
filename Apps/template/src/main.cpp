@@ -1,8 +1,8 @@
 #include <lib/lib.hpp>
 #include <raylib.h>
 
-#include "lib/components/transform3d.hpp"
-#include "lib/components/sceneCamera3d.hpp"
+#include "lib/components/3d/transform3d.hpp"
+#include "lib/components/3d/sceneCamera3d.hpp"
 
 #include "lib/utils/yaml_common.hpp"
 #include "lib/utils/editor_utils.hpp"

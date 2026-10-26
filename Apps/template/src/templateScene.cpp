@@ -1,6 +1,6 @@
 #include "scenes_registration.h"
-#include "lib/core/scene3d.hpp"
-#include "lib/components/components3d.hpp"
+#include "lib/core/scene/scene3d.hpp"
+#include "lib/components/3d/components3d.hpp"
 #include "lib/utils/yaml_common.hpp"
 #include "lib/utils/random_funcs.hpp"
 #include "lib/scripting/luaScript.hpp"

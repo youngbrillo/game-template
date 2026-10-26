@@ -1,5 +1,5 @@
 #pragma once
-#include "lib/components/transform3d.hpp"
+#include "lib/components/3d/transform3d.hpp"
 #include "lib/utils/math_utils.hpp"
 #include "box3d/box3d.h"
 namespace lib

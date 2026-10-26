@@ -1,5 +1,5 @@
 #include "lib/scripting/luaScriptBindings.hpp"
-#include "lib/components/components3d.hpp"
+#include "lib/components/3d/components3d.hpp"
 
 namespace lib::scripting
 {

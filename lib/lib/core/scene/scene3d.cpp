@@ -1,5 +1,5 @@
-#include "lib/core/scene3d.hpp"
-#include "lib/components/components3d.hpp"
+#include "lib/core/scene/scene3d.hpp"
+#include "lib/components/3d/components3d.hpp"
 #include "lib/utils/editor_utils.hpp"
 #include <imgui_stdlib.h>
 #include "ImGuizmo.h"
