@@ -1,0 +1,8 @@
+settings: {name: "scene 5: textures", config: resources/scene5.yaml, script: ""}
+world:
+  - entity: {name: Editor Camera, id: 0X3FD648FE597150C9}
+    SceneCamera3D: {camera: {position: [10, 10, 10], target: [0, 0, 0], up: [0, 1, 0], fovy: 45, projection: 0}}
+    CameraController3D: {enabled: true, mode: 4}
+  - entity: {name: cube, id: 0XF0748B6D75738DBF}
+    Transform3D: {p: [0, 0, 0], s: [1, 1, 1], o: [0, 0, 0, 1]}
+    StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
