@@ -1,5 +1,10 @@
 settings: {name: Template - Scene 1, config: resources/scene1.yaml, script: resources/scene1.lua}
 world:
+  - entity: {name: Editor Camera, id: 0X08C7C3F6F3361B13}
+    SceneCamera3D: {camera: {position: [-43.405922, 43.071423, 7.442623], target: [0, 6, 0], up: [0, 1, 0], fovy: 45, projection: 0}}
+    CameraController3D: {enabled: true, mode: 4}
+    Light3DManager: {id: 0X0000000000000000, ownsShader: false, ambient: [0.78431374, 0.78431374, 0.78431374, 1]}
+    Light3D: {index: 0, type: 0, enabled: true, color: FFFFFFFF}
   - entity: {name: static geometry, id: 0XD35EA04B8A86E5A5}
     children:
       - entity: {name: gound, id: 0X99C63284029CC0C5}
