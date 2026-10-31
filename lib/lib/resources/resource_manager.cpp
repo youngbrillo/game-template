@@ -71,12 +71,17 @@ namespace lib
 			}
 		}
 	}
-	bool ResourceManager::DrawTextureComboBox(const char* label, UUID& id, Texture2D* data)
+
+	using resource_map = std::unordered_map<std::type_index, std::unordered_map<UUID, std::shared_ptr<SceneResource>>>;
+
+	template <typename T>
+	static bool DrawResourceComboBox(const char* label, UUID& id, resource_map& map, 
+		bool is_default_available, bool* is_default_selected = nullptr, UUID default_uuid = 0)
 	{
 		bool updated = false;
 
 		const char* preview_value = "<Default>";
-		auto& typeResources = registry.resources[std::type_index(typeid(TextureResource))];
+		auto& typeResources = map[std::type_index(typeid(T))];
 
 		if (!typeResources.empty() && id != 0)
 		{
@@ -85,6 +90,19 @@ namespace lib
 
 		if (ImGui::BeginCombo(label, preview_value))
 		{
+			if (is_default_available)
+			{
+				if (ImGui::Selectable("<Default>", id == default_uuid))
+				{
+					id = default_uuid;
+					updated = true;
+					if (is_default_selected)
+					{
+						*is_default_selected = true;
+					}
+				}
+			}
+
 			for (auto&& [i, resource] : typeResources)
 			{
 				bool is_selected = i == id;
@@ -92,11 +110,6 @@ namespace lib
 				if (ImGui::Selectable(resource->name.c_str(), is_selected))
 				{
 					id = i;
-
-					if (data) {
-						TextureResource* r = (TextureResource*)(resource.get());
-						*data = r->data;
-					}
 
 					updated = true;
 				}
@@ -110,44 +123,44 @@ namespace lib
 
 		return updated;
 	}
-	bool ResourceManager::DrawFontComboBox(const char* label, UUID& id, Font* data)
+
+
+	bool ResourceManager::DrawTextureComboBox(const char* label, UUID& id, Texture2D* data)
 	{
-		bool updated = false;
+		bool chose_default = false;
+		bool updated = DrawResourceComboBox<TextureResource>(label, id, registry.resources, true, &chose_default);
 
-		const char* preview_value = "<Default>";
-		auto& typeResources = registry.resources[std::type_index(typeid(TextureResource))];
-
-		if (!typeResources.empty() && id != 0)
+		if (updated && data)
 		{
-			preview_value = typeResources[id]->name.c_str();
+			if (chose_default)
+			{
+				*data = Texture2D{ 1,1,1,};
+			}
+			else
+			{
+				auto* r = registry.GetResource<TextureResource>(id);
+				*data = r->data;
+			}
 		}
 
-		if (ImGui::BeginCombo(label, preview_value))
+		return updated;
+	}
+	bool ResourceManager::DrawFontComboBox(const char* label, UUID& id, Font* data)
+	{
+		bool chose_default = false;
+		bool updated = DrawResourceComboBox<FontResource>(label, id, registry.resources, true, &chose_default);
+
+		if (updated && data)
 		{
-			for (auto&& [i, resource] : typeResources)
+			if (chose_default)
 			{
-				if (resource->type != SceneResourceType_Font)
-					continue;
-
-				bool is_selected = i == id;
-
-				if (ImGui::Selectable(resource->name.c_str(), is_selected))
-				{
-					id = i;
-
-					if (data) {
-						FontResource* r = (FontResource*)(resource.get());
-						*data = r->data;
-					}
-
-					updated = true;
-				}
-
-				if (is_selected)
-					ImGui::SetItemDefaultFocus();
+				*data = GetFontDefault();
 			}
-
-			ImGui::EndCombo();
+			else
+			{
+				auto* r = registry.GetResource<FontResource>(id);
+				*data = r->data;
+			}
 		}
 
 		return updated;
