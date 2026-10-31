@@ -10,6 +10,11 @@ namespace lib
 		int filter = TextureFilter::TEXTURE_FILTER_POINT;
 		int wrap   = TextureWrap::TEXTURE_WRAP_REPEAT;
 
+		TextureResource() = default;
+		TextureResource(const TextureResource& res) = default;
+		TextureResource(std::string p_name, UUID p_id) : SceneResource(p_name, p_id, SceneResourceType_Texture) {}
+
+
 		virtual void load() override;
 		virtual void free() override;
 		virtual bool isValid() const override;

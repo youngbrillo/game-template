@@ -10,6 +10,10 @@ namespace lib
 		float size = 24;
 		int filter = TextureFilter::TEXTURE_FILTER_POINT;
 
+		FontResource() = default;
+		FontResource(const FontResource& res) = default;
+		FontResource(std::string p_name, UUID p_id) : SceneResource(p_name, p_id, SceneResourceType_Font) {}
+
 		virtual void load() override;
 		virtual void free() override;
 		virtual bool isValid() const override;
