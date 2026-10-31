@@ -1,13 +1,22 @@
 #pragma once
 #include "transform2d.hpp"
 #include "lib/core/uuid.hpp"
+//#define USE_TEXTURE_HANDLE
+#ifdef USE_TEXTURE_HANDLE
+	#include "lib/resources/resource_manager.hpp"
+#endif // USE_TEXTURE_HANDLE
+
 
 namespace lib
 {
 	struct Sprite
 	{
+#ifdef USE_TEXTURE_HANDLE
+		TextureHandle handle;
+#else
 		UUID id = 10;
 		Texture2D texture = { 1, 1, 1, 7 };
+#endif
 		Color tint = WHITE;
 		Rectangle source = { 0, 0, 32, 32 };
 		int layer = 0;
@@ -22,8 +31,7 @@ namespace lib
 			return r;
 		}
 
-		inline void render(const Transform2D& p_t) const {
-			DrawTexturePro(texture, getFrame(), p_t.getRectangle(), p_t.getOrigin(), p_t.orientation, tint);}
+		void render(const Transform2D& p_t) const;
 		inline static void Render(const Transform2D& transform, const Sprite& sprite) { sprite.render(transform); }
 
 		void serialize(YAML::Emitter& out);

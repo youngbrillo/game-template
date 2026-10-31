@@ -7,6 +7,7 @@
 #include "lib/components/2d/transform2d.hpp"
 #include "lib/components/2d/sceneCamera2d.hpp"
 #include "lib/components/2d/sprite.hpp"
+#include "lib/components/2d/textLabel.hpp"
 #include <lib/utils/editor_utils.hpp>
 #include <imgui_stdlib.h>
 
@@ -270,6 +271,7 @@ namespace lib
 		EntityWriteComponentPro<SceneCamera2D>(out, *this);
 		EntityWriteComponentPro<SceneCamera2DPan>(out, *this);
 		EntityWriteComponentPro<Sprite>(out, *this);
+		EntityWriteComponentPro<TextLabel>(out, *this);
 
 		if (writeEntityCallback) writeEntityCallback(out, *this);
 
@@ -354,6 +356,7 @@ namespace lib
 			EntityReadComponentPro<SceneCamera2D>(node, *this);
 			EntityReadComponentPro<SceneCamera2DPan>(node, *this);
 			EntityReadComponentPro<Sprite>(node, *this);
+			EntityReadComponentPro<TextLabel>(node, *this);
 
 			if (auto n = node["ScriptComponent"]) {
 				auto& c = add<ScriptComponent>();
@@ -443,6 +446,7 @@ namespace lib
 				RenderComponentPopupMenuItemPro<SceneCamera2D>(*this);
 				RenderComponentPopupMenuItemPro<SceneCamera2DPan>(*this);
 				RenderComponentPopupMenuItemPro<Sprite>(*this);
+				RenderComponentPopupMenuItemPro<TextLabel>(*this);
 				ImGui::EndMenu();
 			}
 			if (onAddCallback) onAddCallback(*this);
@@ -466,6 +470,7 @@ namespace lib
 		RenderComponentEditWidgetPro<SceneCamera2D>(*this);
 		RenderComponentEditWidgetPro<SceneCamera2DPan>(*this);
 		RenderComponentEditWidgetPro<Sprite>(*this);
+		RenderComponentEditWidgetPro<TextLabel>(*this);
 
 		if (widgetCallback) widgetCallback(*this);
 	}
@@ -765,6 +770,14 @@ namespace lib
 				Entity e = Entity::Create(world, "Sprite");
 				auto& t = e.add<Transform2D>();
 				auto& s = e.add<Sprite>();
+				selected_entity = e;
+			}
+			if (ImGui::MenuItem("Text")) {
+				Entity e = Entity::Create(world, "Text");
+				auto& t = e.add<Transform2D>();
+				auto& s = e.add<TextLabel>();
+				s.text = "Text Label";
+
 				selected_entity = e;
 			}
 			ImGui::EndMenu();

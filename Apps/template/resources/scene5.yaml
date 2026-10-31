@@ -1,8 +1,12 @@
 settings: {name: "scene 5: textures", config: resources/scene5.yaml, script: ""}
 world:
   - entity: {name: Editor Camera, id: 0X3FD648FE597150C9}
-    SceneCamera3D: {camera: {position: [10, 10, 10], target: [0, 0, 0], up: [0, 1, 0], fovy: 45, projection: 0}}
+    SceneCamera3D: {camera: {position: [10.034995, 9.91135, 10.053053], target: [0, 0, 0], up: [0, 1, 0], fovy: 45, projection: 0}}
     CameraController3D: {enabled: true, mode: 4}
   - entity: {name: cube, id: 0XF0748B6D75738DBF}
     Transform3D: {p: [0, 0, 0], s: [1, 1, 1], o: [0, 0, 0, 1]}
     StaticMesh: {id: 0X0000000000000000, tint: FFFFFFFF}
+  - entity: {name: Text, id: 0XED268265A7C20DF3}
+    Transform2D: {p: [11.7, 659.4], s: [349.5, 36.7], o: [0, 0], a: 0}
+    Sprite: {id: 0X0000000000000000, tint: 85, source: [0, 0, 32, 32], layer: 0}
+    TextLabel: {id: 0X0000000000000000, tint: FFFFFFFF, size: 20, spacing: 1, origin: [-16, -11], text: "Scene: scene 5: Textures & Fonts"}

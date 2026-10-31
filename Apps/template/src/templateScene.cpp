@@ -1,6 +1,7 @@
 #include "scenes_registration.h"
 #include "lib/core/scene/scene3d.hpp"
 #include "lib/components/3d/components3d.hpp"
+#include "lib/components/2d/components2d.hpp"
 #include "lib/utils/yaml_common.hpp"
 #include "lib/utils/random_funcs.hpp"
 #include "lib/scripting/luaScript.hpp"
@@ -103,6 +104,14 @@ namespace lib
 		}
 		virtual void onRenderUI() override {
 			DrawText(TextFormat("Scene: %s", settings.name.c_str()), 10, 10, 20, WHITE);
+
+			world.view<const Transform2D, const Sprite>(entt::exclude<components::HiddenTag>)
+				.each(Sprite::Render);
+
+			world.view<const Transform2D, const TextLabel>(entt::exclude<components::HiddenTag>)
+				.each(TextLabel::Render);
+
+
 		}
 
 		Entity CreateBox(Transform3D t, Color tint = WHITE)
