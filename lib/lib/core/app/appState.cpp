@@ -3,6 +3,7 @@
 #include <lib/utils/editor_utils.hpp>
 #include "tinyfiledialogs.h"
 #include "lib/core/input_manager.hpp"
+#include "lib/resources/resource_manager.hpp"
 
 namespace lib
 {
@@ -102,12 +103,14 @@ namespace lib
 		SetTargetFPS(window.fps);
 		lib::EditorBegin();
 
+		auto& rm = ResourceManager::GetSingleton();
 
 		generators = { nullptr, nullptr, nullptr };
 	}
 
 	void AppState::shutdownApp()
 	{
+		ResourceManager::GetSingleton().FreeAll();
 		lib::EditorEnd();
 		CloseWindow();
 	}
@@ -243,6 +246,9 @@ namespace lib
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();
+		static bool render_asset_browser = true;
+		if (render_asset_browser)
+			ResourceManager::GetSingleton().RenderImGuiWindow(&render_asset_browser);
 	}
 
 
