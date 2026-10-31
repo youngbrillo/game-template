@@ -4,6 +4,16 @@
 
 namespace lib
 {
+    SceneResource::SceneResource(std::string p_path, UUID p_id, SceneResourceType p_type)
+        : id(p_id)
+        , path(p_path)
+        , type(p_type)
+    {
+        if (!path.empty())
+        {
+            name = GetFileNameWithoutExt(path.c_str());
+        }
+    }
     void SceneResource::read(const YAML::Node& node)
     {
         if (node)
