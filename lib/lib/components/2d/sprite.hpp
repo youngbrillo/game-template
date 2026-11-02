@@ -1,7 +1,7 @@
 #pragma once
 #include "transform2d.hpp"
 #include "lib/core/uuid.hpp"
-//#define USE_TEXTURE_HANDLE
+#define USE_TEXTURE_HANDLE
 #ifdef USE_TEXTURE_HANDLE
 	#include "lib/resources/resource_manager.hpp"
 #endif // USE_TEXTURE_HANDLE
