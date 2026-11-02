@@ -27,5 +27,10 @@ namespace lib
 
 		bool DrawTextureComboBox(const char* label, UUID& id, Texture2D* data);
 		bool DrawFontComboBox(const char* label, UUID& id, Font* data);
+
+
+		void Read(const YAML::Node& root);
+		void Write(YAML::Emitter& out);
+		std::vector<SceneResource*>* resource_list = nullptr;
 	};
 }

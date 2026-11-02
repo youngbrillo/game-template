@@ -51,4 +51,8 @@ namespace lib
 		virtual void onWrite(YAML::Emitter& out) const {}
 		virtual void onInspectWindow() {}
 	};
+
+
+	void parse_scene_parameters(const YAML::Node& node, 
+		int& p_type, std::string& p_path, std::string& p_name, UUID& p_uuid);
 }

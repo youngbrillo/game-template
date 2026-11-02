@@ -3,6 +3,8 @@
 #include <imgui_stdlib.h>
 #include "ImGuizmo.h"
 
+#include <lib/resources/resource_manager.hpp>
+
 namespace lib
 {
 	iAppScene::iAppScene(SceneSettings p_settings)
@@ -135,4 +137,15 @@ namespace lib
 		ImGui::End();
 		ImGui::PopStyleVar();
 	}
+
+	void iAppScene::onDataSave(YAML::Emitter& out)
+	{
+		ResourceManager::GetSingleton().Write(out);
+	}
+
+	void iAppScene::onDataLoad(const YAML::Node& root)
+	{
+		ResourceManager::GetSingleton().Read(root);
+	}
+
 }

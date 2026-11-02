@@ -150,11 +150,12 @@ namespace lib
 			return e;
 		}
 	protected:
-		virtual void onDataSave(YAML::Emitter& root) {
-		
+		virtual void onDataSave(YAML::Emitter& out) {
+			Scene3D::onDataSave(out);
 		}
 		virtual void onDataLoad(const YAML::Node& root) {
-		
+			Scene3D::onDataLoad(root);
+
 		}
 	};
 }

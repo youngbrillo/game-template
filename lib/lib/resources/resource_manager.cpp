@@ -19,16 +19,26 @@ namespace lib
 	TextureHandle ResourceManager::AddTexture(std::string filepath)
 	{
 		TextureHandle res = registry.Load<TextureResource>(filepath, 0);
+		if (resource_list && res.Get())
+		{
+			resource_list->push_back(res.Get());
+		}
+
 		return res;
 	}
 	TextureHandle ResourceManager::GetTexture(UUID id)
 	{
 		TextureHandle res = registry.GetResourceHandle<TextureResource>(id);
+
 		return res;
 	}
 	FontHandle ResourceManager::AddFont(std::string filepath)
 	{
 		FontHandle res = registry.Load<FontResource>(filepath, 0);
+		if (resource_list && res.Get())
+		{
+			resource_list->push_back(res.Get());
+		}
 		return res;
 	}
 
@@ -164,5 +174,53 @@ namespace lib
 		}
 
 		return updated;
+	}
+
+	void ResourceManager::Read(const YAML::Node& root)
+	{
+		if (resource_list)
+			resource_list->clear();
+
+		for (auto node : root["resources"])
+		{
+			if (auto rNode = node["resource"])
+			{
+				int type = SceneResourceType_Invalid;
+				UUID id = 0;
+				std::string name, path;
+				parse_scene_parameters(rNode, type, path, name, id);
+
+				if (type == SceneResourceType_Texture)
+				{
+					auto handle = registry.Load<TextureResource>(path, id);
+					handle->read(rNode); //get additional parameters
+					if (resource_list && handle.Get() != nullptr)
+						resource_list->push_back(handle.Get());
+				}
+				else if (type == SceneResourceType_Font)
+				{
+					auto handle = registry.Load<FontResource>(path, id);
+					if (resource_list && handle.Get() != nullptr)
+						resource_list->push_back(handle.Get());
+				}
+			}
+		}
+	}
+
+	void ResourceManager::Write(YAML::Emitter& out)
+	{
+		out << YAML::Key << "resources" << YAML::Value
+			<< YAML::BeginSeq;
+		for (auto& t : registry.resources)
+		{
+			for (auto& [id, i] : t.second)
+			{
+				out << YAML::BeginMap
+					<< YAML::Key << "resource" << YAML::Value;
+					i->write(out, true);
+				out << YAML::EndMap;
+			}
+		}
+		out << YAML::EndSeq;
 	}
 }

@@ -91,4 +91,11 @@ namespace lib
 
         ImGui::End();
     }
+    void parse_scene_parameters(const YAML::Node& node, int& type, std::string& path, std::string& name, UUID& id)
+    {
+        readYamlValue(node["type"], &type);
+        readYamlValue(node["id"], &id);
+        readYamlValue(node["name"], &name);
+        readYamlValue(node["path"], &path);
+    }
 }

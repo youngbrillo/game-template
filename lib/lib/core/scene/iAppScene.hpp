@@ -53,5 +53,8 @@ namespace lib
 		virtual void onInspectEntity(Entity& selected) {}
 		virtual void onInspectViewportTop(Entity& selected) {}
 		virtual void onInspectViewportBottom(float* viewportPos, float* viewportSize, Entity& selected) {}
+		
+		virtual void onDataSave(YAML::Emitter& out) override;
+		virtual void onDataLoad(const YAML::Node& root) override;
 	};
 }
