@@ -1,5 +1,6 @@
 #include "lib/core/scene/scene3d.hpp"
 #include "lib/components/3d/components3d.hpp"
+#include "lib/components/2d/components2d.hpp"
 #include "lib/utils/editor_utils.hpp"
 #include <imgui_stdlib.h>
 #include "ImGuizmo.h"
@@ -128,14 +129,27 @@ namespace lib
 	{
 		const SceneCamera3D& camera_in_use = getSceneCamera();
 		BeginMode3D(camera_in_use);
-			this->onRender3D(camera_in_use);
 
 			for (auto&& [id, transform, controller] : world.view<Transform3D, PlayerMoverController>().each())
 			{
 				Entity e(id, world);
 				controller.render();
 			}
+
+			world.view<Transform3D, StaticMesh>(entt::exclude<components::HiddenTag>)
+				.each(StaticMesh::Render);
+
+			this->onRender3D(camera_in_use);
+
 		EndMode3D();
+
+		world.view<const Transform2D, const Sprite>(entt::exclude<components::HiddenTag>)
+			.each(Sprite::Render);
+
+		world.view<const Transform2D, const TextLabel>(entt::exclude<components::HiddenTag>)
+			.each(TextLabel::Render);
+
+
 		this->onRenderUI();
 	}
 
@@ -147,6 +161,11 @@ namespace lib
 		}
 
 		return default_camera;
+	}
+
+	iScene* Scene3D::Generate(SceneSettings settings)
+	{
+		return new Scene3D(settings);
 	}
 
 	void Scene3D::onInspectViewportTop(Entity& selected)

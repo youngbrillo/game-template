@@ -4,33 +4,6 @@
 
 namespace lib
 {
-   
-    static bool DoImportFont()
-    {
-        bool added = false;
-        const char* aTitle = "Import Font File";
-        const char* aDefaultPathAndFile = GetWorkingDirectory();
-        int const aNumOfFilterPatterns = 2;
-        const char* aFilterPatterns[] = { "*.ttf","*.otf" };
-        const char* aSingleFilterDescription = "Font files";
-        int const aAllowMultipleSelects = 0;
-
-        char const* file = tinyfd_openFileDialog(
-            aTitle,
-            aDefaultPathAndFile,
-            aNumOfFilterPatterns,
-            aFilterPatterns,
-            aSingleFilterDescription,
-            aAllowMultipleSelects);
-
-        if (file)
-        {
-            ResourceManager::GetSingleton().AddFont(file);
-            added = true;
-        }
-        return added;
-    }
-
     void ResourceBrowser::HelpMarker(const char* desc)
     {
         ImGui::TextDisabled("(?)");
@@ -57,10 +30,10 @@ namespace lib
             if (ImGui::MenuItem("Import Font"))
                 ImportFont(registry);
 
-            if (ImGui::MenuItem("Import Model", nullptr, nullptr, false))
+            if (ImGui::MenuItem("Import Model"))
                 ImportModel(registry);
 
-            if (ImGui::MenuItem("Import Model Animation", nullptr, nullptr, false))
+            if (ImGui::MenuItem("Import Model Animation"))
                 ImportModelAnimation(registry);
 
             if (ImGui::MenuItem("Import Material", nullptr, nullptr, false))
@@ -341,9 +314,34 @@ namespace lib
     }
     void ResourceBrowser::ImportModel(ResourceRegistry* registry)
     {
+        const char* aTitle = "Import Model File";
+        const char* aDefaultPathAndFile = GetWorkingDirectory();
+        int const aNumOfFilterPatterns = 3;
+        const char* aFilterPatterns[] = { "*.obj","*.gltf", "*.glb"};
+        const char* aSingleFilterDescription = "Model files";
+        int const aAllowMultipleSelects = 0;
+
+        char const* file = tinyfd_openFileDialog(
+            aTitle,
+            aDefaultPathAndFile,
+            aNumOfFilterPatterns,
+            aFilterPatterns,
+            aSingleFilterDescription,
+            aAllowMultipleSelects);
+
+        if (file)
+        {
+            registry->Load<ModelResource>(file, 0);
+        }
     }
     void ResourceBrowser::ImportModelAnimation(ResourceRegistry* registry)
     {
+        const char* aTitle = "Import Model Animation";
+        const char* aDefaultPathAndFile = GetWorkingDirectory();
+        int const aNumOfFilterPatterns = 2;
+        const char* aFilterPatterns[] = { "*.gltf", "*.glb" };
+        const char* aSingleFilterDescription = "Model Animation files";
+        int const aAllowMultipleSelects = 0;
     }
     void ResourceBrowser::ImportMaterial(ResourceRegistry* registry)
     {

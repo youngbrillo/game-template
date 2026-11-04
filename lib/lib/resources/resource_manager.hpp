@@ -5,7 +5,8 @@
 namespace lib
 {
 	using TextureHandle = ResourceHandle<TextureResource>;
-	using FontHandle    = ResourceHandle<FontResource>;
+	using FontHandle = ResourceHandle<FontResource>;
+	using ModelHandle    = ResourceHandle<ModelResource>;
 
 	class ResourceManager
 	{
@@ -17,8 +18,12 @@ namespace lib
 
 		TextureHandle AddTexture(std::string filepath);
 		TextureHandle GetTexture(UUID id);
+
 		FontHandle AddFont(std::string filepath);
 		FontHandle GetFont(UUID id);
+
+		ModelHandle AddModel(std::string filepath);
+		ModelHandle GetModel(UUID id);
 
 		void FreeAll();
 		inline ResourceRegistry* GetRegistry() { return &registry; }
@@ -27,6 +32,7 @@ namespace lib
 
 		bool DrawTextureComboBox(const char* label, UUID& id, Texture2D* data);
 		bool DrawFontComboBox(const char* label, UUID& id, Font* data);
+		bool DrawModelComboBox(const char* label, UUID& id, Model* data);
 
 
 		void Read(const YAML::Node& root);

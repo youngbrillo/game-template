@@ -6,7 +6,11 @@ namespace lib
 {
 	ResourceManager::ResourceManager()
 	{
-
+		registry.Load<ModelResource>("cube", 1);
+		registry.Load<ModelResource>("sphere", 2);
+		registry.Load<ModelResource>("plane", 3);
+		registry.Load<ModelResource>("torus", 4);
+		registry.Load<ModelResource>("cylinder", 5);
 	}
 	ResourceManager::~ResourceManager()
 	{
@@ -45,6 +49,18 @@ namespace lib
 	FontHandle ResourceManager::GetFont(UUID id)
 	{
 		FontHandle res = registry.GetResourceHandle<FontResource>(id);
+		return res;
+	}
+
+	ModelHandle ResourceManager::AddModel(std::string filepath)
+	{
+		auto res = registry.Load<ModelResource>(filepath, 0);
+		return res;
+	}
+
+	ModelHandle ResourceManager::GetModel(UUID id)
+	{
+		auto res = registry.GetResourceHandle<ModelResource>(id);
 		return res;
 	}
 
@@ -171,6 +187,19 @@ namespace lib
 				auto* r = registry.GetResource<FontResource>(id);
 				*data = r->data;
 			}
+		}
+
+		return updated;
+	}
+
+	bool ResourceManager::DrawModelComboBox(const char* label, UUID& id, Model* data)
+	{
+		bool updated = DrawResourceComboBox<ModelResource>(label, id, registry.resources, false);
+
+		if (updated && data)
+		{
+			auto* r = registry.GetResource<ModelResource>(id);
+			*data = r->data;
 		}
 
 		return updated;

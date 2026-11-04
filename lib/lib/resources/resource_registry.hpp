@@ -2,6 +2,10 @@
 #include "resource_types.hpp"
 #include "types/texture_type.hpp"
 #include "types/font_type.hpp"
+#include "types/model_type.hpp"
+#include "types/model_animation.hpp"
+#include "types/shader_type.hpp"
+#include "types/material_type.hpp"
 
 #include <memory>
 #include <unordered_map>

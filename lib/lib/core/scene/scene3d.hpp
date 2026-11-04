@@ -25,6 +25,7 @@ namespace lib
 		virtual void renderScene();
 
 		const SceneCamera3D& getSceneCamera() const;
+		static iScene* Generate(SceneSettings settings);
 	protected:
 		virtual void onInspectViewportTop(Entity& selected) override;
 		virtual void onInspectViewportBottom(float* viewportPos, float* viewportSize, Entity& selected) override;
